@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_23_190313) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_23_234951) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "coaches", force: :cascade do |t|
     t.string "first_name"
     t.string "last_name"
-    t.bigint "associated_player_id", null: false
+    t.bigint "associated_player_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "team_id", null: false
@@ -49,8 +49,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_190313) do
     t.bigint "gameday_players_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "team_id", null: false
     t.index ["game_id"], name: "index_gameday_teams_on_game_id"
     t.index ["gameday_players_id"], name: "index_gameday_teams_on_gameday_players_id"
+    t.index ["team_id"], name: "index_gameday_teams_on_team_id"
   end
 
   create_table "games", force: :cascade do |t|
@@ -119,6 +121,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_190313) do
   add_foreign_key "gameday_players", "players"
   add_foreign_key "gameday_teams", "gameday_players", column: "gameday_players_id"
   add_foreign_key "gameday_teams", "games"
+  add_foreign_key "gameday_teams", "teams"
   add_foreign_key "games", "gameday_teams"
   add_foreign_key "games", "innings"
   add_foreign_key "innings", "games"
