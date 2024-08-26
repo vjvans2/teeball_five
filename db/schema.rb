@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_23_234951) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_26_164528) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,6 +21,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_234951) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "team_id", null: false
+    t.boolean "is_head_coach"
     t.index ["associated_player_id"], name: "index_coaches_on_associated_player_id"
     t.index ["team_id"], name: "index_coaches_on_team_id"
   end
@@ -34,24 +35,20 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_234951) do
 
   create_table "gameday_players", force: :cascade do |t|
     t.bigint "game_id", null: false
-    t.bigint "player_innings_id", null: false
     t.bigint "player_id", null: false
     t.boolean "is_present"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["game_id"], name: "index_gameday_players_on_game_id"
     t.index ["player_id"], name: "index_gameday_players_on_player_id"
-    t.index ["player_innings_id"], name: "index_gameday_players_on_player_innings_id"
   end
 
   create_table "gameday_teams", force: :cascade do |t|
     t.bigint "game_id", null: false
-    t.bigint "gameday_players_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "team_id", null: false
     t.index ["game_id"], name: "index_gameday_teams_on_game_id"
-    t.index ["gameday_players_id"], name: "index_gameday_teams_on_gameday_players_id"
     t.index ["team_id"], name: "index_gameday_teams_on_team_id"
   end
 
@@ -62,10 +59,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_234951) do
     t.date "date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "inning_id", null: false
-    t.bigint "gameday_team_id", null: false
-    t.index ["gameday_team_id"], name: "index_games_on_gameday_team_id"
-    t.index ["inning_id"], name: "index_games_on_inning_id"
   end
 
   create_table "innings", force: :cascade do |t|
@@ -79,7 +72,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_234951) do
   create_table "player_innings", force: :cascade do |t|
     t.bigint "player_id", null: false
     t.bigint "inning_id", null: false
-    t.bigint "fielding_position_id", null: false
+    t.bigint "fielding_position_id"
     t.integer "batting_order"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -117,13 +110,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_234951) do
   add_foreign_key "coaches", "players", column: "associated_player_id"
   add_foreign_key "coaches", "teams"
   add_foreign_key "gameday_players", "games"
-  add_foreign_key "gameday_players", "player_innings", column: "player_innings_id"
   add_foreign_key "gameday_players", "players"
-  add_foreign_key "gameday_teams", "gameday_players", column: "gameday_players_id"
   add_foreign_key "gameday_teams", "games"
   add_foreign_key "gameday_teams", "teams"
-  add_foreign_key "games", "gameday_teams"
-  add_foreign_key "games", "innings"
   add_foreign_key "innings", "games"
   add_foreign_key "player_innings", "fielding_positions"
   add_foreign_key "player_innings", "innings"

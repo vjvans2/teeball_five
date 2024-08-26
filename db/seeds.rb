@@ -1,9 +1,89 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
+require 'faker'
+require 'date'
+
+# # create fielding positions
+# high_tier_positions = %w[P 1B]
+# mid_tier_positions = %w[C 2B SS 3B]
+# positions = %w[LF LC RC RF P C 1B 2B SS 3B nil]
+
+# positions.each do |position|
+#   rank = case position
+#   when *high_tier_positions
+#       1
+#   when *mid_tier_positions
+#       2
+#   else
+#       3
 #   end
+
+#   FieldingPosition.create!(name: position, hierarchy_rank: rank)
+# end
+
+# create a team
+team = Team.create!(
+  name: Faker::TvShows::Archer.quote,
+  city: Faker::TvShows::Archer.location
+)
+
+p "team #{team.id} created"
+
+# create eleven players
+player_ids = []
+(1..11).each do |jersey_num|
+  new_player = Player.create!(
+      first_name: Faker::Name.first_name,
+      last_name: Faker::Name.last_name,
+      jersey_number: jersey_num,
+      team: team
+    )
+
+  player_ids << new_player.id
+end
+p "#{player_ids.count} players added"
+
+# create a head and asst coach
+# TODO --- add coach limit, only one head coach, coach titles
+associated_player_id = player_ids.sample
+Coach.create!(
+    first_name: Faker::Name.first_name,
+    last_name: Faker::Name.last_name,
+    associated_player_id: associated_player_id,
+    is_head_coach: true,
+    team: team
+  )
+Coach.create!(
+  first_name: Faker::Name.first_name,
+  last_name: Faker::Name.last_name,
+  associated_player_id: nil,
+  is_head_coach: false,
+  team: team
+)
+
+p "2 coaches created"
+
+# create a game instance
+game = Game.create!(
+  location: Faker::TvShows::Archer.location,
+  is_home: true,
+  opponent_name: "Opponent Name",
+  date: Date.today
+)
+
+p "game #{game.id} created"
+
+# create gameday team
+gameday_team = GamedayTeam.create!(
+  game_id: game.id,
+  team_id: team.id
+)
+
+p "gameday team #{gameday_team.id} created"
+
+# # create gameday players
+# gameday_players = [];
+# player_ids.each do |player_id|
+#   GamedayPlayer.create!(
+#     game_id: game.id,
+#     player_id:
+#   )
+# end
