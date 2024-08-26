@@ -1,6 +1,5 @@
 class TeamsController < ApplicationController
   def show
-    @post = Post.find(params[:id])
-  en
-
+    @team = Team.find(params[:id])
+  end
 end
