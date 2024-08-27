@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "player_innings/post"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -12,4 +13,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
   resources :teams, only: [ :show ]
+  resources :games, only: [ :show, :post ]
+  resources :gameday_teams, only: [ :show, :post ]
+  resources :gameday_players, only: [ :show, :post ]
 end
