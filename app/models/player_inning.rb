@@ -1,5 +1,6 @@
 class PlayerInning < ApplicationRecord
-  has_one :player
-  has_one :inning
-  # has_one :fielding_position, optional: true
+  belongs_to :player
+  belongs_to :inning
+  belongs_to :game
+  belongs_to :gameday_player
 end
