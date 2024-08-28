@@ -21,15 +21,15 @@ require 'date'
 
 # create a team
 team = Team.create!(
-  name: Faker::TvShows::Archer.quote,
-  city: Faker::TvShows::Archer.location
+  name: 'Sharks',
+  city: 'Westerville'
 )
 
 p "team #{team.id} created"
 
 # create eleven players
 player_ids = []
-(1..11).each do |jersey_num|
+(1..10).each do |jersey_num|
   new_player = Player.create!(
       first_name: Faker::Name.first_name,
       last_name: Faker::Name.last_name,
@@ -80,10 +80,16 @@ gameday_team = GamedayTeam.create!(
 p "gameday team #{gameday_team.id} created"
 
 # # create gameday players
-# gameday_players = [];
-# player_ids.each do |player_id|
-#   GamedayPlayer.create!(
-#     game_id: game.id,
-#     player_id:
-#   )
-# end
+gameday_players = []
+player_ids.each do |player_id|
+  gameday_players << GamedayPlayer.create!(
+    player_id: player_id,
+    is_present: true,
+    gameday_team_id: gameday_team.id
+  )
+end
+
+p "#{gameday_players.count} gameday_players created"
+
+# # This is working, I think we're ready for some logic
+# # GamedayTeam.last.gameday_players.sample.player.full_name
