@@ -1,23 +1,23 @@
 require 'faker'
 require 'date'
 
-# # create fielding positions
-# high_tier_positions = %w[P 1B]
-# mid_tier_positions = %w[C 2B SS 3B]
-# positions = %w[LF LC RC RF P C 1B 2B SS 3B nil]
+# create fielding positions
+high_tier_positions = %w[P 1B]
+mid_tier_positions = %w[C 2B SS 3B]
+positions = %w[LF LC RC RF P C 1B 2B SS 3B]
 
-# positions.each do |position|
-#   rank = case position
-#   when *high_tier_positions
-#       1
-#   when *mid_tier_positions
-#       2
-#   else
-#       3
-#   end
+positions.each do |position|
+  rank = case position
+  when *high_tier_positions
+      1
+  when *mid_tier_positions
+      2
+  else
+      3
+  end
 
-#   FieldingPosition.create!(name: position, hierarchy_rank: rank)
-# end
+  FieldingPosition.create!(name: position, hierarchy_rank: rank)
+end
 
 # create a team
 team = Team.create!(
