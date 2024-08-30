@@ -17,6 +17,7 @@ RSpec.describe GetRandomPosition, type: :service do
         end
       end
     end
+
     describe '#choose_and_remove' do
       context 'when params are valid' do
         it 'grabs a random position' do
@@ -25,7 +26,7 @@ RSpec.describe GetRandomPosition, type: :service do
         end
       end
 
-      context 'when available_positions.empty? == true' do
+      context 'when available_positions are empty' do
         it 'returns nil' do
           picked = FieldingPosition.all.map(&:name)
           random = GetRandomPosition.new(picked).choose_and_remove

@@ -22,10 +22,10 @@ class GenerateGameAssignmentsService
     end
 
     # resets positions back to original
-    positions = GetRandomPosition.new
-    assignments[inning_index].each_with_index do |player, index|
-      pos = positions.choose_and_remove
-      assignments[inning_index][index] = pos
+    positions = GetRandomPosition.new(assignments, inning_index)
+    assignments[inning_index].each_with_index do |_, player_index|
+      pos = positions.choose_and_remove(player_index)
+      assignments[inning_index][player_index] = pos
       # put validity logic here
     end
 
