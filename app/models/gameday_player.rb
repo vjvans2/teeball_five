@@ -1,5 +1,5 @@
 class GamedayPlayer < ApplicationRecord
-  has_one :game
-  has_one :player
-  has_many :player_innings
+  belongs_to :player
+  has_many :player_innings, dependent: :destroy
+  belongs_to :gameday_team
 end
