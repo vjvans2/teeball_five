@@ -7,7 +7,7 @@ class GenerateGameAssignmentsService
   end
 
   def generate_game_assignments
-    assignments = Array.new(@number_of_innings) { Array.new(@number_of_gameday_players) }  # 4x11
+    assignments = Array.new(@number_of_innings) { Array.new(@number_of_gameday_players) }
     schedule = generate_assignments(0, assignments)
 
     p schedule
@@ -21,6 +21,7 @@ class GenerateGameAssignmentsService
       return assignments
     end
 
+    # resets positions back to original
     positions = GetRandomPosition.new
     assignments[inning_index].each_with_index do |player, index|
       pos = positions.choose_and_remove
