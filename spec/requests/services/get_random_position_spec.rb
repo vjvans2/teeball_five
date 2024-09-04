@@ -17,20 +17,46 @@ RSpec.describe GetRandomPosition, type: :service do
         end
       end
     end
+    let(:number_of_innings) { 4 }
+    let(:number_of_gameday_players) { 11 }
+    let(:assignments) { Array.new(number_of_innings) { Array.new(number_of_gameday_players) } }
 
     describe '#choose_and_remove' do
       context 'when params are valid' do
         it 'grabs a random position' do
-          random = GetRandomPosition.new.choose_and_remove
+          player_index = 0
+          klass = GetRandomPosition.new(assignments, 0)
+
+          random = klass.choose_and_remove(player_index)
           expect(positions.include?(random)).to be_truthy
         end
       end
 
       context 'when available_positions are empty' do
         it 'returns nil' do
+          player_index = 0
           picked = FieldingPosition.all.map(&:name)
-          random = GetRandomPosition.new(picked).choose_and_remove
+          klass = GetRandomPosition.new(assignments, 0, picked)
+          random = klass.choose_and_remove(player_index)
           expect(random).to eq nil
+        end
+      end
+    end
+
+    describe '#is_valid_inning?' do
+      context 'when the inning is full with all positions' do
+        it 'returns true' do
+          assignments[0] = positions
+          klass = GetRandomPosition.new(assignments, 0)
+          expect(klass.is_valid_inning?).to eq true
+        end
+      end
+
+      context 'when the inning does not include all positions' do
+        it 'returns false' do
+          assignments[0] = [ 'hi mom', 'hi dad' ]
+          klass = GetRandomPosition.new(assignments, 0)
+          expect(klass.is_valid_inning?).to eq false
         end
       end
     end

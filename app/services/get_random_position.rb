@@ -26,6 +26,13 @@ class GetRandomPosition
     end
   end
 
+  def is_valid_inning?
+    # does the "complete" inning have all 10 primary positions covered?
+    assignments[current_inning_index].all? do |inning_assignment|
+      positions.include?(inning_assignment)
+    end
+  end
+
   private
 
   def available_positions

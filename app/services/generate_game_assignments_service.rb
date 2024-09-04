@@ -27,6 +27,19 @@ class GenerateGameAssignmentsService
       pos = positions.choose_and_remove(player_index)
       assignments[inning_index][player_index] = pos
       # put validity logic here
+
+      if player_index == assignments[inning_index].size - 1
+        # check is_valid_inning?
+        if positions.is_valid_inning?
+          p ("hi from valid inning #{inning_index + 1}")
+        else
+          p ("hi from invalid inning #{inning_index + 1}, resetting...")
+
+          # try again, brute force for now?
+          assignments[inning_index] = Array.new(@number_of_gameday_players)
+          generate_assignments(inning_index, assignments)
+        end
+      end
     end
 
     result = generate_assignments(inning_index + 1, assignments)
