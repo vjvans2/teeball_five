@@ -1,9 +1,10 @@
 class GetRandomPosition
-  attr_reader :positions, :picked_positions, :assignments,
+  attr_reader :all_positions, :positions, :picked_positions, :assignments,
   :current_inning_index, :outfield_positions
 
   def initialize(assignments, current_inning_index, picked_positions = [])
-    @positions = FieldingPosition.all.map(&:name)
+    @all_positions = FieldingPosition.all.map(&:name)
+    @volatile_positions = FieldingPosition.all.map(&:name)
     @assignments = assignments
     @current_inning_index = current_inning_index
     @picked_positions = picked_positions
@@ -16,7 +17,7 @@ class GetRandomPosition
     selected_position = available_positions.sample
 
     if is_valid_choice?(selected_position, player_index)
-      @positions.delete(selected_position)
+      @volatile_positions.delete(selected_position)
       @picked_positions = []
 
       selected_position
@@ -28,15 +29,16 @@ class GetRandomPosition
 
   def is_valid_inning?
     # does the "complete" inning have all 10 primary positions covered?
+    # we need an @all_positions because a complete inning will have an empty array for @volatile_positions
     assignments[current_inning_index].all? do |inning_assignment|
-      positions.include?(inning_assignment)
+      @all_positions.include?(inning_assignment)
     end
   end
 
   private
 
   def available_positions
-    @positions - @picked_positions
+    @volatile_positions - @picked_positions
   end
 
   def is_valid_choice?(selected_position, player_index)
