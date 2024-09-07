@@ -11,6 +11,8 @@ class GenerateGameAssignmentsService
     assignments = Array.new(@number_of_innings) { Array.new(@number_of_gameday_players) }
     schedule = generate_assignments(0, assignments)
 
+    save_player_assignments(schedule)
+
     p "iterations required ---- #{@iterations}"
     p schedule
   end
@@ -30,11 +32,8 @@ class GenerateGameAssignmentsService
     assignments[inning_index].each_with_index do |_, player_index|
       pos = positions.choose_and_remove(player_index)
       assignments[inning_index][player_index] = pos
-      # put validity logic here
 
       if player_index == assignments[inning_index].size - 1
-        # check is_valid_inning?
-        # binding.pry
         if positions.is_valid_inning?
           p ("hi from valid inning #{inning_index + 1}")
         else
@@ -51,5 +50,12 @@ class GenerateGameAssignmentsService
     return result if result
 
     nil
+  end
+
+  def save_player_assignments(schedule)
+    # foreach player, save off their game assignments
+    @gameday_team.gameday_players.each do |player|
+      # keep working on me!!
+    end
   end
 end
