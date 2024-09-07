@@ -1,13 +1,14 @@
 FactoryBot.define do
   factory :fielding_position do
-      hierarchy_rank { 3 }
+    hierarchy_rank { 3 }
+    name { "Outfield" }
 
-      trait :high_tier do
-        hierarchy_rank { 1 }
-      end
-
-      trait :mid_tier do
-        hierarchy_rank { 2 }
-      end
+    trait :high_tier do
+      hierarchy_rank { 1 }
     end
+
+    trait :mid_tier do
+      hierarchy_rank { 2 }
+    end
+  end
 end
