@@ -1,24 +1,13 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+To setup the project run:
+```bash
+bundle exec rake project:setup
+```
 
-Things you may want to cover:
+Start the Rails server
+```bash
+rails server
+```
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Navigate to <a>localhost:3000</a>
