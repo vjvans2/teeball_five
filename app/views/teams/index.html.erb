@@ -1,0 +1,10 @@
+<h1>Teams</h1>
+<p>Hello from Teams!</p>
+
+<ul>
+  <% @teams.each do |team| %>
+    <li>
+      <%= link_to team.name, team_path(team) %>
+    </li>
+  <% end %>
+</ul>
