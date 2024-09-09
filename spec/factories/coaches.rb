@@ -3,7 +3,7 @@ FactoryBot.define do
     first_name { "Jimbob" }
     last_name  { "Muscles" }
     is_head_coach { false } # but he wishes he was
-    associated_player_id { nil }
+    associated_player { nil }
     team { build(:team) }
   end
 end

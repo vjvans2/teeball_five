@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_28_061633) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_07_200706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -61,6 +61,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_28_061633) do
     t.date "date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "season_id", null: false
+    t.index ["season_id"], name: "index_games_on_season_id"
   end
 
   create_table "innings", force: :cascade do |t|
@@ -97,10 +99,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_28_061633) do
 
   create_table "seasons", force: :cascade do |t|
     t.bigint "team_id", null: false
-    t.bigint "games_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["games_id"], name: "index_seasons_on_games_id"
     t.index ["team_id"], name: "index_seasons_on_team_id"
   end
 
@@ -120,13 +120,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_28_061633) do
   add_foreign_key "gameday_players", "players"
   add_foreign_key "gameday_teams", "games"
   add_foreign_key "gameday_teams", "teams"
+  add_foreign_key "games", "seasons"
   add_foreign_key "innings", "games"
   add_foreign_key "player_innings", "fielding_positions"
   add_foreign_key "player_innings", "games"
   add_foreign_key "player_innings", "innings"
   add_foreign_key "player_innings", "players"
   add_foreign_key "players", "teams"
-  add_foreign_key "seasons", "games", column: "games_id"
   add_foreign_key "seasons", "teams"
   add_foreign_key "teams", "gameday_teams", column: "gameday_teams_id"
 end
