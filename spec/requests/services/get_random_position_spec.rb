@@ -18,8 +18,9 @@ RSpec.describe GetRandomPosition, type: :service do
       end
     end
     let(:number_of_innings) { 4 }
-    let(:number_of_gameday_players) { 11 }
-    let(:assignments) { Array.new(number_of_innings) { Array.new(number_of_gameday_players) } }
+    let(:number_of_gameday_players) { 10 }
+    let(:empty_innings) { Array.new(number_of_innings) { nil } }
+    let(:assignments) { Array.new(number_of_gameday_players) { { player_id: nil, game_assignments: Array.new(number_of_innings) { nil } } } }
 
     describe '#choose_and_remove' do
       context 'when params are valid' do
