@@ -17,5 +17,5 @@
 #  fk_rails_...  (game_id => games.id)
 #
 class Inning < ApplicationRecord
-  has_one :game
+  belongs_to :game
 end

@@ -11,26 +11,27 @@ class GetRandomPosition
     @outfield_positions = %w[LF LC RC RF]
   end
 
-  def choose_and_remove(player_index)
+  def choose_and_remove(player_id)
     return nil if available_positions.empty?
 
     selected_position = available_positions.sample
 
-    if is_valid_choice?(selected_position, player_index)
+    if is_valid_choice?(selected_position, player_id)
       @volatile_positions.delete(selected_position)
       @picked_positions = []
 
       selected_position
     else
       @picked_positions << selected_position
-      choose_and_remove(player_index)
+      choose_and_remove(player_id)
     end
   end
 
   def is_valid_inning?
     # does the "complete" inning have all 10 primary positions covered?
     # we need an @all_positions because a complete inning will have an empty array for @volatile_positions
-    assignments[current_inning_index].all? do |inning_assignment|
+    inning_assignments = assignments.map { |a| a[:game_assignments][current_inning_index] }
+    inning_assignments.all? do |inning_assignment|
       @all_positions.include?(inning_assignment)
     end
   end
@@ -41,7 +42,7 @@ class GetRandomPosition
     @volatile_positions - @picked_positions
   end
 
-  def is_valid_choice?(selected_position, player_index)
+  def is_valid_choice?(selected_position, player_id)
     # have you played this position already this game?
     # is this P and you've already been 1B?
     # is this 1B and you've already been P?
@@ -50,7 +51,7 @@ class GetRandomPosition
 
     return true if @current_inning_index == 0
 
-    player = current_player(player_index)
+    player = current_player(player_id)
 
     return false if player[:game_positions].include?(selected_position)
     return false if player[:game_positions].include?("P") && selected_position == "1B"
@@ -60,11 +61,11 @@ class GetRandomPosition
     true
   end
 
-  def current_player(player_index)
+  def current_player(player_id)
     # take the vertical index of the 4x11 and give me a flattened array
     # of all of that players current positions and logic this game
 
-    player_flat_array = @assignments.map { |inning| inning[player_index] }
+    player_flat_array = @assignments.find { |a| a[:player_id] == player_id }[:game_assignments]
     {
       game_positions: player_flat_array,
       full_outfield?: (@outfield_positions & player_flat_array).size == 2

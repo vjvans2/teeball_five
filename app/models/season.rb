@@ -17,5 +17,5 @@
 #
 class Season < ApplicationRecord
   has_many :games
-  has_one :team
+  belongs_to :team
 end
