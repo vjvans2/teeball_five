@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe GetRandomPosition, type: :service do
-  describe '#GetRandomPosition' do
+  describe '--GetRandomPosition--' do
     let(:high_tier_positions) { %w[P 1B] }
     let(:mid_tier_positions) { %w[C 2B SS 3B] }
     let(:positions) { %w[LF LC RC RF P C 1B 2B SS 3B] }
@@ -47,7 +47,10 @@ RSpec.describe GetRandomPosition, type: :service do
     describe '#is_valid_inning?' do
       context 'when the inning is full with all positions' do
         it 'returns true' do
-          assignments[0] = positions
+          positions.each_with_index do |pos, index|
+            assignments[index][:game_assignments][0] = pos
+          end
+
           klass = GetRandomPosition.new(assignments, 0)
           expect(klass.is_valid_inning?).to eq true
         end
@@ -55,7 +58,9 @@ RSpec.describe GetRandomPosition, type: :service do
 
       context 'when the inning does not include all positions' do
         it 'returns false' do
-          assignments[0] = [ 'hi mom', 'hi dad' ]
+          assignments[0][:game_assignments][0] = 'hi mom'
+          assignments[1][:game_assignments][0] = 'hi dad'
+
           klass = GetRandomPosition.new(assignments, 0)
           expect(klass.is_valid_inning?).to eq false
         end
