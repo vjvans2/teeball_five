@@ -24,9 +24,8 @@
 #  fk_rails_...  (team_id => teams.id)
 #
 class Player < ApplicationRecord
-  # belongs_to :player_inning
-  # belongs_to :gameday_player
   belongs_to :team
+  has_many :player_innings
 
   def full_name
     "#{first_name} #{last_name}"

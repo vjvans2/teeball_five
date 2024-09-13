@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_09_175132) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_13_023813) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -38,11 +38,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_09_175132) do
     t.boolean "is_present"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "player_innings_id"
     t.bigint "gameday_team_id", null: false
     t.index ["gameday_team_id"], name: "index_gameday_players_on_gameday_team_id"
     t.index ["player_id"], name: "index_gameday_players_on_player_id"
-    t.index ["player_innings_id"], name: "index_gameday_players_on_player_innings_id"
   end
 
   create_table "gameday_teams", force: :cascade do |t|
@@ -121,7 +119,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_09_175132) do
   add_foreign_key "coaches", "players", column: "associated_player_id"
   add_foreign_key "coaches", "teams"
   add_foreign_key "gameday_players", "gameday_teams"
-  add_foreign_key "gameday_players", "player_innings", column: "player_innings_id"
   add_foreign_key "gameday_players", "players"
   add_foreign_key "gameday_teams", "games"
   add_foreign_key "gameday_teams", "teams"

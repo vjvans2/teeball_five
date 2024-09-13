@@ -19,7 +19,7 @@
 #  fk_rails_...  (team_id => teams.id)
 #
 class GamedayTeam < ApplicationRecord
-  has_one :game
-  has_many :gameday_players
+  belongs_to :game
   belongs_to :team
+  has_many :gameday_players
 end

@@ -9,5 +9,4 @@
 #  updated_at     :datetime         not null
 #
 class FieldingPosition < ApplicationRecord
-  belongs_to :player_inning, optional: true
 end
