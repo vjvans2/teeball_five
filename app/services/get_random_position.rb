@@ -43,25 +43,48 @@ class GetRandomPosition
   end
 
   def is_valid_choice?(selected_position, player_id)
-    # have you played this position already this game?
-    # is this P and you've already been 1B?
-    # is this 1B and you've already been P?
-    # have you already played two outfield innings?
-    # TODO: were you out for an inning and need preferential infield treatment?
-
     return true if @current_inning_index == 0
 
-    player = current_player(player_id)
+    current_player_game = current_player_game_assignments(player_id)
+    previous_player_game_assignments = @assignments.find { |a| a[:player_id] == player_id }[:previous_assignments]
 
-    return false if player[:game_positions].include?(selected_position)
-    return false if player[:game_positions].include?("P") && selected_position == "1B"
-    return false if player[:game_positions].include?("1B") && selected_position == "P"
-    return false if player[:full_outfield?] && @outfield_positions.include?(selected_position)
+    # have you played this {selected_position} already this game?
+    return false if current_player_game[:game_positions].include?(selected_position)
+
+    # is {selected_position} P and you've already been 1B this game?
+    return false if current_player_game[:game_positions].include?("P") && selected_position == "1B"
+
+    # is {selected_position} 1B and you've already been P this game?
+    return false if current_player_game[:game_positions].include?("1B") && selected_position == "P"
+
+    # is {selected_position} in the outfield and you already played two outfield innings this game?
+    return false if current_player_game[:full_outfield?] && @outfield_positions.include?(selected_position)
+
+    # is {selected_position} P, but you played there last game?
+    # is {selected_position} P, but not everybody on the team has played {selected_position} yet?
+    # 
+    # is {selected_position} 1B, but you played there last game?
+    # is {selected_position} 1B, but not everybody on the team has played {selected_position} yet?
+    # 
+    # is {selected_position} 2B, but you played there last game?
+    # is {selected_position} 2B, but not everybody on the team has played {selected_position} yet?
+    # 
+    # is {selected_position} 3B, but you played there last game?
+    # is {selected_position} 3B, but not everybody on the team has played {selected_position} yet?
+    # 
+    # is {selected_position} SS, but you played there last game?
+    # is {selected_position} SS, but not everybody on the team has played {selected_position} yet?
+    # 
+    # is {selected_position} C, but you played there last game?
+    # is {selected_position} C, but not everybody on the team has played {selected_position} yet?
+    # 
+    # is {selected_position} LF/LC, but you played LF/LC in a previous inning?
+    # is {selected_position} RF/RC, but you played RF/RC in a previous inning?
 
     true
   end
 
-  def current_player(player_id)
+  def current_player_game_assignments(player_id)
     # take the vertical index of the 4x11 and give me a flattened array
     # of all of that players current positions and logic this game
 

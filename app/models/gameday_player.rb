@@ -22,5 +22,7 @@
 class GamedayPlayer < ApplicationRecord
   belongs_to :gameday_team
   belongs_to :player
+
+  # TODO -- this will need to be restricted by game/season
   has_many :player_innings, through: :player
 end

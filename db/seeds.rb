@@ -27,7 +27,11 @@ team = Team.create!(
 
 p "team #{team.id} created"
 
-# create eleven players
+season = Season.create!(team_id: team.id, name: 'Test Season 1')
+
+p "#{season.name} created"
+
+# create ten players
 player_ids = []
 (1..10).each do |jersey_num|
   new_player = Player.create!(
@@ -65,8 +69,9 @@ p "2 coaches created"
 game = Game.create!(
   location: Faker::TvShows::Archer.location,
   is_home: true,
-  opponent_name: "Opponent Name",
-  date: Date.today
+  opponent_name: "#{Faker::TvShows::Archer.character}'s whining kids",
+  date: Date.today,
+  season_id: season.id
 )
 
 p "game #{game.id} created"

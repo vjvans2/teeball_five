@@ -20,11 +20,34 @@ class GenerateGameAssignmentsService
     list = Array.new(@number_of_gameday_players)
     empty_innings = Array.new(@number_of_innings) { nil }
 
-    @gameday_team.gameday_players.each_with_index do |gameday_player, index|
-      list[index] = { player_id: gameday_player.player_id, game_assignments: empty_innings.dup }
+    # "shuffle" will eventually be modified to take into player leadoffs/hrs
+    @gameday_team.gameday_players.shuffle.each_with_index do |gameday_player, index|
+      list[index] = {
+        player_id: gameday_player.player_id,
+        game_assignments: empty_innings.dup,
+        previous_assignments:  player_previous_assignments(gameday_player)
+      }
     end
 
     list
+  end
+
+  def player_previous_assignments(gameday_player)
+    gameday_player.player_innings
+      .group_by(&:game_id)
+      .map do |game_id, innings|
+        {
+          game_id: game_id,
+          game_assignments: innings.map do |inning|
+            {
+              player_id: inning.player_id,
+              inning_number: inning.inning.inning_number,
+              batting_order: inning.batting_order,
+              position: inning.fielding_position.name
+            }
+          end
+        }
+      end
   end
 
   # Recursive function to generate assignments
