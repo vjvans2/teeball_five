@@ -9,8 +9,8 @@
 #  updated_at :datetime         not null
 #
 class Team < ApplicationRecord
-  has_many :players
-  has_many :coaches
+  has_many :players, dependent: :destroy
+  has_many :coaches, dependent: :destroy
 
   validates :city, presence: true
   validates :name, presence: true

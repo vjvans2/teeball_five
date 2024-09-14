@@ -8,3 +8,44 @@
 <%= link_to 'Edit Team', edit_team_path(@team), class: "btn btn-warning" %>
 <%= link_to 'Delete Team', team_path(@team), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: "btn btn-danger" %>
 <%= link_to 'Back to Teams', teams_path, class: "btn btn-secondary" %>
+
+<hr />
+
+<h2>Players</h2>
+
+<%= link_to 'Add New Player', new_team_player_path(@team), class: 'btn btn-primary mb-3' %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Jersey Number</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Assist Outs</th>
+      <th>Direct Outs</th>
+      <th>Home Runs</th>
+      <th>Lead-offs</th>
+      <th>Postgame Cheers</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @team.players.each do |player| %>
+      <tr>
+        <td><%= player.jersey_number %></td>
+        <td><%= player.first_name %></td>
+        <td><%= player.last_name %></td>
+        <td><%= player.assist_out %></td>
+        <td><%= player.direct_out %></td>
+        <td><%= player.homeruns %></td>
+        <td><%= player.leadoffs %></td>
+        <td><%= player.postgame_cheer %></td>
+        <td>
+          <%= link_to 'Show', player_path(player), class: 'btn btn-sm btn-info' %>
+          <%= link_to 'Edit', edit_player_path(player), class: 'btn btn-sm btn-warning' %>
+          <%= link_to 'Delete', player_path(player), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-sm btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
