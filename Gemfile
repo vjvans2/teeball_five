@@ -11,8 +11,6 @@ gem "jbuilder"
 gem "faker"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
-gem 'dartsass-sprockets' # required for bootstap
-gem 'bootstrap', '~> 5.3.2'
 
 group :development, :test do
   gem 'annotaterb'

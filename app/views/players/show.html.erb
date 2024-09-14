@@ -1,0 +1,19 @@
+<h1><%= @player.full_name %></h1>
+
+<p>
+  <strong>Jersey Number:</strong> <%= @player.jersey_number %><br>
+  <strong>First Name:</strong> <%= @player.first_name %><br>
+  <strong>Last Name:</strong> <%= @player.last_name %><br>
+  <strong>Assist Outs:</strong> <%= @player.assist_out || 0 %><br>
+  <strong>Direct Outs:</strong> <%= @player.direct_out || 0 %><br>
+  <strong>Home Runs:</strong> <%= @player.homeruns || 0 %><br>
+  <strong>Lead-offs:</strong> <%= @player.leadoffs || 0 %><br>
+  <strong>Postgame Cheers:</strong> <%= @player.postgame_cheer || 0 %><br>
+  <strong>Team:</strong> <%= link_to @player.team.full_team_name, @player.team %><br>
+  <strong>Created At:</strong> <%= @player.created_at.strftime("%B %d, %Y %I:%M %p") %><br>
+  <strong>Updated At:</strong> <%= @player.updated_at.strftime("%B %d, %Y %I:%M %p") %><br>
+</p>
+
+<%= link_to 'Edit', edit_player_path(@player), class: 'btn btn-warning' %>
+<%= link_to 'Delete', player_path(@player), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: "btn btn-danger" %>
+<%= link_to 'Back to Team', @player.team, class: 'btn btn-secondary' %>

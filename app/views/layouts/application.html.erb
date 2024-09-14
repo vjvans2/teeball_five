@@ -2,26 +2,49 @@
 <html>
   <head>
     <title><%= content_for(:title) || "Teeball Five" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= yield :head %>
+    <!-- Bootstrap CSS CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    >
 
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <!-- Your custom stylesheets -->
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
+    <!-- Importmap needs to be loaded before module scripts -->
     <%= javascript_importmap_tags %>
   </head>
 
-  <%= render 'layouts/navbar' %>
+  <body>
+    <%= render 'layouts/navbar' %>
 
-  <div class="container-fluid">
-    <body>
+    <div class="container-fluid">
+      <!-- Flash messages section -->
+      <% if flash[:notice] %>
+        <div class="alert alert-success">
+          <%= flash[:notice] %>
+        </div>
+      <% end %>
+
+      <% if flash[:alert] %>
+        <div class="alert alert-danger">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
       <%= yield %>
-    </body>
-  </div>
+    </div>
+
+    <!-- Your custom JavaScript (Turbo and Stimulus controllers) -->
+    <!-- No need to include javascript_importmap_tags again here -->
+
+    <!-- Bootstrap JS CDN -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    ></script>
+  </body>
 </html>
