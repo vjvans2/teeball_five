@@ -12,7 +12,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "home#homepage"
-  resources :teams, only: [ :index, :show ]
+  resources :teams
   resources :games, only: [ :index, :show, :post ]
   resources :gameday_teams, only: [ :show, :post ]
   resources :gameday_players, only: [ :show, :post ]

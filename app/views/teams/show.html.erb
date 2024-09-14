@@ -1,2 +1,10 @@
-<h1>Hi from Show Team</h1>
-<%= @team.inspect %>
+<h1><%= @team.full_team_name %></h1>
+
+<p>
+  <strong>City:</strong> <%= @team.city %><br>
+  <strong>Name:</strong> <%= @team.name %>
+</p>
+
+<%= link_to 'Edit Team', edit_team_path(@team), class: "btn btn-warning" %>
+<%= link_to 'Delete Team', team_path(@team), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: "btn btn-danger" %>
+<%= link_to 'Back to Teams', teams_path, class: "btn btn-secondary" %>
