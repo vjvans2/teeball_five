@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_13_023813) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_14_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -112,8 +112,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_13_023813) do
     t.string "city"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "gameday_teams_id"
-    t.index ["gameday_teams_id"], name: "index_teams_on_gameday_teams_id"
   end
 
   add_foreign_key "coaches", "players", column: "associated_player_id"
@@ -130,5 +128,4 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_13_023813) do
   add_foreign_key "player_innings", "players"
   add_foreign_key "players", "teams"
   add_foreign_key "seasons", "teams"
-  add_foreign_key "teams", "gameday_teams", column: "gameday_teams_id"
 end
