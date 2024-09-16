@@ -10,7 +10,8 @@
 #
 # Indexes
 #
-#  index_innings_on_game_id  (game_id)
+#  index_innings_on_game_id                    (game_id)
+#  index_innings_on_game_id_and_inning_number  (game_id,inning_number) UNIQUE
 #
 # Foreign Keys
 #

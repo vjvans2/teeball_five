@@ -10,8 +10,10 @@ class GenerateGameAssignmentsService
   def generate_game_assignments
     schedule = generate_assignments(0, initial_assignments)
 
+    save_player_inning_assignments(schedule)
+
     p "iterations required ---- #{@iterations}"
-    p schedule
+    schedule.map {|s| {player_id: s[:player_id], game_assignments: s[:game_assignments]}}
   end
 
   private
@@ -81,7 +83,7 @@ class GenerateGameAssignmentsService
       end
     end
 
-    save_player_inning_assignments(player_game_assignments, inning_index)
+    # save_player_inning_assignments(player_game_assignments, inning_index)
 
     result = generate_assignments(inning_index + 1, player_game_assignments)
     return result if result
@@ -89,18 +91,21 @@ class GenerateGameAssignmentsService
     nil
   end
 
-  def save_player_inning_assignments(player_game_assignments, inning_index)
+  def save_player_inning_assignments(player_game_assignments)
     game_id = @gameday_team.game_id
-    inning = Inning.create!(game_id: game_id, inning_number: inning_index + 1)
-    player_game_assignments.each_with_index do |player, batting_order_index|
-      inning_fielding_position_id = FieldingPosition.find_by_name(player[:game_assignments][inning_index]).id
-      PlayerInning.create!(
-        player_id: player[:player_id],
-        inning_id: inning.id,
-        fielding_position_id: inning_fielding_position_id,
-        batting_order: batting_order_index + 1,
-        game_id: game_id
-      )
+
+    (1..@number_of_innings).each do |inning_number|
+      inning = Inning.create!(game_id: game_id, inning_number: inning_number)
+      player_game_assignments.each_with_index do |player, batting_order_index|
+        inning_fielding_position_id = FieldingPosition.find_by_name(player[:game_assignments][inning_number - 1]).id
+        PlayerInning.create!(
+          player_id: player[:player_id],
+          inning_id: inning.id,
+          fielding_position_id: inning_fielding_position_id,
+          batting_order: batting_order_index + 1,
+          game_id: game_id
+        )
+      end
     end
   end
 end

@@ -29,7 +29,6 @@ class GetRandomPosition
 
   def is_valid_inning?
     # does the "complete" inning have all 10 primary positions covered?
-    # we need an @all_positions because a complete inning will have an empty array for @volatile_positions
     inning_assignments = assignments.map { |a| a[:game_assignments][current_inning_index] }
     inning_assignments.all? do |inning_assignment|
       @all_positions.include?(inning_assignment)
