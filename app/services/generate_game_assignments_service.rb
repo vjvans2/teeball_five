@@ -13,7 +13,7 @@ class GenerateGameAssignmentsService
     save_player_inning_assignments(schedule)
 
     p "iterations required ---- #{@iterations}"
-    schedule.map {|s| {player_id: s[:player_id], game_assignments: s[:game_assignments]}}
+    schedule
   end
 
   private
@@ -40,11 +40,11 @@ class GenerateGameAssignmentsService
       .map do |game_id, innings|
         {
           game_id: game_id,
+          batting_order: innings.first.batting_order,
           game_assignments: innings.map do |inning|
             {
               player_id: inning.player_id,
               inning_number: inning.inning.inning_number,
-              batting_order: inning.batting_order,
               position: inning.fielding_position.name
             }
           end
@@ -82,8 +82,6 @@ class GenerateGameAssignmentsService
         end
       end
     end
-
-    # save_player_inning_assignments(player_game_assignments, inning_index)
 
     result = generate_assignments(inning_index + 1, player_game_assignments)
     return result if result

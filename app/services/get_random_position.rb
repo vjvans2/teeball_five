@@ -42,10 +42,15 @@ class GetRandomPosition
   end
 
   def is_valid_choice?(selected_position, player_id)
-    return true if @current_inning_index == 0
+    all_player_previous_game_assignments = @assignments.find { |a| a[:player_id] == player_id }[:previous_assignments]
+
+    return true if @current_inning_index == 0 && all_player_previous_game_assignments.empty?
+    
+    # will need outfield love eventually
+    # is are you assigned {selected_position}, but you played there last game?
+    return false if played_that_position_last_game?(selected_position, all_player_previous_game_assignments.last)
 
     current_player_game = current_player_game_assignments(player_id)
-    previous_player_game_assignments = @assignments.find { |a| a[:player_id] == player_id }[:previous_assignments]
 
     # have you played this {selected_position} already this game?
     return false if current_player_game[:game_positions].include?(selected_position)
@@ -59,22 +64,11 @@ class GetRandomPosition
     # is {selected_position} in the outfield and you already played two outfield innings this game?
     return false if current_player_game[:full_outfield?] && @outfield_positions.include?(selected_position)
 
-    # is {selected_position} P, but you played there last game?
     # is {selected_position} P, but not everybody on the team has played {selected_position} yet?
-    # 
-    # is {selected_position} 1B, but you played there last game?
     # is {selected_position} 1B, but not everybody on the team has played {selected_position} yet?
-    # 
-    # is {selected_position} 2B, but you played there last game?
     # is {selected_position} 2B, but not everybody on the team has played {selected_position} yet?
-    # 
-    # is {selected_position} 3B, but you played there last game?
     # is {selected_position} 3B, but not everybody on the team has played {selected_position} yet?
-    # 
-    # is {selected_position} SS, but you played there last game?
     # is {selected_position} SS, but not everybody on the team has played {selected_position} yet?
-    # 
-    # is {selected_position} C, but you played there last game?
     # is {selected_position} C, but not everybody on the team has played {selected_position} yet?
     # 
     # is {selected_position} LF/LC, but you played LF/LC in a previous inning?
@@ -83,10 +77,15 @@ class GetRandomPosition
     true
   end
 
-  def current_player_game_assignments(player_id)
-    # take the vertical index of the 4x11 and give me a flattened array
-    # of all of that players current positions and logic this game
+  def played_that_position_last_game?(selected_position, players_last_game)
+    return false if players_last_game.nil? || players_last_game.empty?
+    return false if @outfield_positions.include?(selected_position)
 
+    players_last_game_positions = players_last_game[:game_assignments].map {|plg| plg[:position] }
+    players_last_game_positions.include?(selected_position)
+  end
+
+  def current_player_game_assignments(player_id)
     player_flat_array = @assignments.find { |a| a[:player_id] == player_id }[:game_assignments]
     {
       game_positions: player_flat_array,

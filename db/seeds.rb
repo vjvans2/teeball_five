@@ -122,7 +122,15 @@ gameday_team = GamedayTeam.create!(
 p "gameday team #{gameday_team.id} created"
 
 gameday_players = []
-player_ids.each do |player_id|
+# player_ids.each do |player_id|
+#   gameday_players << GamedayPlayer.create!(
+#     player_id: player_id,
+#     is_present: true,
+#     gameday_team_id: gameday_team.id
+#   )
+# end
+
+(1..10).each do |player_id|
   gameday_players << GamedayPlayer.create!(
     player_id: player_id,
     is_present: true,
