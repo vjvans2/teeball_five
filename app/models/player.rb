@@ -27,6 +27,9 @@ class Player < ApplicationRecord
   belongs_to :team
   has_many :player_innings
 
+  validates :team_id, presence: true
+  validates :first_name, presence: true
+
   def full_name
     "#{first_name} #{last_name}"
   end

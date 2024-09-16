@@ -1,0 +1,28 @@
+<h1>Edit Team</h1>
+<% if @team.errors.any? %>
+  <div class="alert alert-danger">
+    <h4>Errors:</h4>
+    <ul>
+      <% @team.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with(model: @team, class: "form") do |form| %>
+  <div class="mb-3">
+    <%= form.label :city, class: "form-label" %>
+    <%= form.text_field :city, class: "form-control", value: @team.city, placeholder: "Enter team city" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :name, class: "form-label" %>
+    <%= form.text_field :name, class: "form-control", value: @team.name, placeholder: "Enter team name" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.submit "Update Team", class: "btn btn-primary" %>
+    <%= link_to 'Cancel', teams_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
