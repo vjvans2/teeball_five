@@ -3,12 +3,13 @@ class GetRandomPosition
   :current_inning_index, :outfield_positions
 
   def initialize(assignments, current_inning_index, picked_positions = [])
-    @all_positions = FieldingPosition.all.map(&:name)
-    @volatile_positions = FieldingPosition.all.map(&:name)
+    @all_positions = FieldingPosition.all.pluck(:name)
+    @volatile_positions = FieldingPosition.all.pluck(:name)
     @assignments = assignments
     @current_inning_index = current_inning_index
     @picked_positions = picked_positions
-    @outfield_positions = %w[LF LC RC RF]
+    @outfield_positions = FieldingPosition.outfield.pluck(:name)
+    @infield_positions = FieldingPosition.infield.pluck(:name)
   end
 
   def choose_and_remove(player_id)
@@ -68,6 +69,9 @@ class GetRandomPosition
     # is {selected_position} in the outfield and you already played two outfield innings this game?
     return false if current_player_game[:full_outfield?] && @outfield_positions.include?(selected_position)
 
+    # has player already played two positions in the infield in this game?
+    # return false if current_player_game[:full_infield?] && @infield_positions.include?(selected_position)
+
     # is {selected_position} LF/LC, but you played LF/LC in a previous inning?
     # is {selected_position} RF/RC, but you played RF/RC in a previous inning?
 
@@ -123,7 +127,8 @@ class GetRandomPosition
     player_flat_array = @assignments.find { |a| a[:player_id] == player_id }[:game_assignments]
     {
       game_positions: player_flat_array,
-      full_outfield?: (@outfield_positions & player_flat_array).size == 2
+      full_outfield?: (@outfield_positions & player_flat_array).size == 2,
+      full_infield?: (@infield_positions & player_flat_array).size === 3
     }
   end
 end

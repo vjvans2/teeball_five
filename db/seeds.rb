@@ -111,7 +111,7 @@ game_two = Game.create!(
   season_id: season.id
 )
 
-p "game #{game.id} created"
+p "game #{game_two.id} created"
 
 # create gameday team
 gameday_team_two = GamedayTeam.create!(
@@ -134,7 +134,7 @@ gameday_players = []
   gameday_players << GamedayPlayer.create!(
     player_id: player_id,
     is_present: true,
-    gameday_team_two_id: gameday_team_two.id
+    gameday_team_id: gameday_team_two.id
   )
 end
 
