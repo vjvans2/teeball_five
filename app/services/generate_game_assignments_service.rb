@@ -43,7 +43,6 @@ class GenerateGameAssignmentsService
           batting_order: innings.first.batting_order,
           game_assignments: innings.map do |inning|
             {
-              player_id: inning.player_id,
               inning_number: inning.inning.inning_number,
               position: inning.fielding_position.name
             }

@@ -29,7 +29,8 @@ class GetRandomPosition
 
   def is_valid_inning?
     # does the "complete" inning have all 10 primary positions covered?
-    inning_assignments = assignments.map { |a| a[:game_assignments][current_inning_index] }
+    # what about a >10 or <10 scenario?
+    inning_assignments = @assignments.map { |a| a[:game_assignments][current_inning_index] }
     inning_assignments.all? do |inning_assignment|
       @all_positions.include?(inning_assignment)
     end
@@ -45,10 +46,13 @@ class GetRandomPosition
     all_player_previous_game_assignments = @assignments.find { |a| a[:player_id] == player_id }[:previous_assignments]
 
     return true if @current_inning_index == 0 && all_player_previous_game_assignments.empty?
-    
+
     # will need outfield love eventually
-    # is are you assigned {selected_position}, but you played there last game?
-    return false if played_that_position_last_game?(selected_position, all_player_previous_game_assignments.last)
+    # are you assigned {selected_infield_position}, but you played there last game?
+    return false if played_that_infield_position_last_game?(selected_position, all_player_previous_game_assignments.last)
+
+    # are you assigned {selected_infield_position}, but not everybody on the team has played there {minimum_amount_of_times} yet?
+    return false if other_teammates_have_not_played_there_equally_yet?(selected_position, player_id)
 
     current_player_game = current_player_game_assignments(player_id)
 
@@ -64,25 +68,55 @@ class GetRandomPosition
     # is {selected_position} in the outfield and you already played two outfield innings this game?
     return false if current_player_game[:full_outfield?] && @outfield_positions.include?(selected_position)
 
-    # is {selected_position} P, but not everybody on the team has played {selected_position} yet?
-    # is {selected_position} 1B, but not everybody on the team has played {selected_position} yet?
-    # is {selected_position} 2B, but not everybody on the team has played {selected_position} yet?
-    # is {selected_position} 3B, but not everybody on the team has played {selected_position} yet?
-    # is {selected_position} SS, but not everybody on the team has played {selected_position} yet?
-    # is {selected_position} C, but not everybody on the team has played {selected_position} yet?
-    # 
     # is {selected_position} LF/LC, but you played LF/LC in a previous inning?
     # is {selected_position} RF/RC, but you played RF/RC in a previous inning?
 
     true
   end
 
-  def played_that_position_last_game?(selected_position, players_last_game)
+  def played_that_infield_position_last_game?(selected_position, players_last_game)
     return false if players_last_game.nil? || players_last_game.empty?
     return false if @outfield_positions.include?(selected_position)
 
-    players_last_game_positions = players_last_game[:game_assignments].map {|plg| plg[:position] }
+    players_last_game_positions = players_last_game[:game_assignments].map { |plg| plg[:position] } - @outfield_positions
     players_last_game_positions.include?(selected_position)
+  end
+
+  def other_teammates_have_not_played_there_equally_yet?(selected_position, player_id)
+    return false if @assignments.all? { |a| a[:previous_assignments].nil? }
+
+    return false if @outfield_positions.include?(selected_position)
+
+    # count up how many of the players have played that position
+    # if current player isn't in that list, then return true: other players need to be this position before they can again.
+    return true unless player_ids_in_line_to_play_position(selected_position).include?(player_id)
+
+    false
+  end
+
+  def player_ids_in_line_to_play_position(selected_position)
+    # returns an array of hashes where the player_id is matched with how many total times they've played {selected_position}
+    player_count_hash_array = @assignments.map do |a|
+      pos_count = 0
+      a[:previous_assignments].each do |pa|
+        if pa[:game_assignments].any? { |ga| ga[:position] == selected_position }
+          pos_count = pos_count + 1
+        end
+      end
+      { player_id: a[:player_id], pos_count: pos_count }
+    end
+
+    # group_by count
+    # map the values to new hashes where the count and values are in same hash
+    # sort from least to biggest
+    # get first to get the lowest entries and/or non-players in that position
+    # sort for cleanliness
+    player_count_hash_array
+      .group_by { |data| data[:pos_count] }
+      .map { |k, v| { count: k, player_ids: v.map { |h| h[:player_id] } } }
+      .sort_by { |gb| gb[:count] }
+      .first[:player_ids]
+      .sort
   end
 
   def current_player_game_assignments(player_id)
