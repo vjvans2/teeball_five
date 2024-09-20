@@ -14,4 +14,8 @@ class FieldingPosition < ApplicationRecord
 
   scope :infield, -> { where(name: INFIELD_POSITIONS) }
   scope :outfield, -> { where(name: OUTFIELD_POSITIONS) }
+
+  scope :high_priority, -> { where(hierarchy_rank: 1) }
+  scope :medium_priority, -> { where(hierarchy_rank: 2) }
+  scope :low_priority, -> { where(hierarchy_rank: 3) }
 end
