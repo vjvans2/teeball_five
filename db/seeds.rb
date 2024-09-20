@@ -1,6 +1,8 @@
 require 'faker'
 require 'date'
 
+# # # run with rake db:seed # # #
+
 # create fielding positions
 high_tier_positions = %w[P 1B]
 mid_tier_positions = %w[C 2B SS 3B]
@@ -27,7 +29,11 @@ team = Team.create!(
 
 p "team #{team.id} created"
 
-# create eleven players
+season = Season.create!(team_id: team.id, name: 'Test Season 1')
+
+p "#{season.name} created"
+
+# create ten players
 player_ids = []
 (1..10).each do |jersey_num|
   new_player = Player.create!(
@@ -65,8 +71,9 @@ p "2 coaches created"
 game = Game.create!(
   location: Faker::TvShows::Archer.location,
   is_home: true,
-  opponent_name: "Opponent Name",
-  date: Date.today
+  opponent_name: "#{Faker::TvShows::Archer.character}'s whining kids",
+  date: Date.yesterday,
+  season_id: season.id
 )
 
 p "game #{game.id} created"
@@ -91,5 +98,52 @@ end
 
 p "#{gameday_players.count} gameday_players created"
 
-# # This is working, I think we're ready for some logic
-# # GamedayTeam.last.gameday_players.sample.player.full_name
+GenerateGameAssignmentsService.new(gameday_team).generate_game_assignments
+
+p "----- GAME 1 PLAYERINNINGS CREATED -----"
+
+# create a game instance
+game_two = Game.create!(
+  location: Faker::TvShows::Archer.location,
+  is_home: true,
+  opponent_name: "#{Faker::TvShows::Archer.character}'s whining kids",
+  date: Date.today,
+  season_id: season.id
+)
+
+p "game #{game_two.id} created"
+
+# create gameday team
+gameday_team_two = GamedayTeam.create!(
+  game_id: game_two.id,
+  team_id: team.id
+)
+
+p "gameday team #{gameday_team_two.id} created"
+
+gameday_players = []
+# player_ids.each do |player_id|
+#   gameday_players << GamedayPlayer.create!(
+#     player_id: player_id,
+#     is_present: true,
+#     gameday_team_two_id: gameday_team_two.id
+#   )
+# end
+
+(1..10).each do |player_id|
+  gameday_players << GamedayPlayer.create!(
+    player_id: player_id,
+    is_present: true,
+    gameday_team_id: gameday_team_two.id
+  )
+end
+
+p "#{gameday_players.count} gameday_players created"
+
+GenerateGameAssignmentsService.new(gameday_team_two).generate_game_assignments
+
+p "----- GAME 2 PLAYERINNINGS CREATED -----"
+
+# klass = GenerateGameAssignmentsService.new(GamedayTeam.last)
+# klass.send(:initial_assignments)
+# klass.generate_game_assignments

@@ -10,8 +10,10 @@ class GenerateGameAssignmentsService
   def generate_game_assignments
     schedule = generate_assignments(0, initial_assignments)
 
+    save_player_inning_assignments(schedule)
+
     p "iterations required ---- #{@iterations}"
-    p schedule
+    schedule
   end
 
   private
@@ -20,11 +22,33 @@ class GenerateGameAssignmentsService
     list = Array.new(@number_of_gameday_players)
     empty_innings = Array.new(@number_of_innings) { nil }
 
-    @gameday_team.gameday_players.each_with_index do |gameday_player, index|
-      list[index] = { player_id: gameday_player.player_id, game_assignments: empty_innings.dup }
+    # "shuffle" will eventually be modified to take into player leadoffs/hrs
+    @gameday_team.gameday_players.shuffle.each_with_index do |gameday_player, index|
+      list[index] = {
+        player_id: gameday_player.player_id,
+        game_assignments: empty_innings.dup,
+        previous_assignments:  player_previous_assignments(gameday_player)
+      }
     end
 
     list
+  end
+
+  def player_previous_assignments(gameday_player)
+    gameday_player.player_innings
+      .group_by(&:game_id)
+      .map do |game_id, innings|
+        {
+          game_id: game_id,
+          batting_order: innings.first.batting_order,
+          game_assignments: innings.map do |inning|
+            {
+              inning_number: inning.inning.inning_number,
+              position: inning.fielding_position.name
+            }
+          end
+        }
+      end
   end
 
   # Recursive function to generate assignments
@@ -58,26 +82,27 @@ class GenerateGameAssignmentsService
       end
     end
 
-    save_player_inning_assignments(player_game_assignments, inning_index)
-
     result = generate_assignments(inning_index + 1, player_game_assignments)
     return result if result
 
     nil
   end
 
-  def save_player_inning_assignments(player_game_assignments, inning_index)
+  def save_player_inning_assignments(player_game_assignments)
     game_id = @gameday_team.game_id
-    inning = Inning.create!(game_id: game_id, inning_number: inning_index + 1)
-    player_game_assignments.each_with_index do |player, batting_order_index|
-      inning_fielding_position_id = FieldingPosition.find_by_name(player[:game_assignments][inning_index]).id
-      PlayerInning.create!(
-        player_id: player[:player_id],
-        inning_id: inning.id,
-        fielding_position_id: inning_fielding_position_id,
-        batting_order: batting_order_index + 1,
-        game_id: game_id
-      )
+
+    (1..@number_of_innings).each do |inning_number|
+      inning = Inning.create!(game_id: game_id, inning_number: inning_number)
+      player_game_assignments.each_with_index do |player, batting_order_index|
+        inning_fielding_position_id = FieldingPosition.find_by_name(player[:game_assignments][inning_number - 1]).id
+        PlayerInning.create!(
+          player_id: player[:player_id],
+          inning_id: inning.id,
+          fielding_position_id: inning_fielding_position_id,
+          batting_order: batting_order_index + 1,
+          game_id: game_id
+        )
+      end
     end
   end
 end

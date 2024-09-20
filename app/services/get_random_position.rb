@@ -3,12 +3,13 @@ class GetRandomPosition
   :current_inning_index, :outfield_positions
 
   def initialize(assignments, current_inning_index, picked_positions = [])
-    @all_positions = FieldingPosition.all.map(&:name)
-    @volatile_positions = FieldingPosition.all.map(&:name)
+    @all_positions = FieldingPosition.all.pluck(:name)
+    @volatile_positions = FieldingPosition.all.pluck(:name)
     @assignments = assignments
     @current_inning_index = current_inning_index
     @picked_positions = picked_positions
-    @outfield_positions = %w[LF LC RC RF]
+    @outfield_positions = FieldingPosition.outfield.pluck(:name)
+    @infield_positions = FieldingPosition.infield.pluck(:name)
   end
 
   def choose_and_remove(player_id)
@@ -29,8 +30,8 @@ class GetRandomPosition
 
   def is_valid_inning?
     # does the "complete" inning have all 10 primary positions covered?
-    # we need an @all_positions because a complete inning will have an empty array for @volatile_positions
-    inning_assignments = assignments.map { |a| a[:game_assignments][current_inning_index] }
+    # what about a >10 or <10 scenario?
+    inning_assignments = @assignments.map { |a| a[:game_assignments][current_inning_index] }
     inning_assignments.all? do |inning_assignment|
       @all_positions.include?(inning_assignment)
     end
@@ -43,32 +44,91 @@ class GetRandomPosition
   end
 
   def is_valid_choice?(selected_position, player_id)
-    # have you played this position already this game?
-    # is this P and you've already been 1B?
-    # is this 1B and you've already been P?
-    # have you already played two outfield innings?
-    # TODO: were you out for an inning and need preferential infield treatment?
+    all_player_previous_game_assignments = @assignments.find { |a| a[:player_id] == player_id }[:previous_assignments]
 
-    return true if @current_inning_index == 0
+    return true if @current_inning_index == 0 && all_player_previous_game_assignments.empty?
 
-    player = current_player(player_id)
+    # will need outfield love eventually
+    # are you assigned {selected_infield_position}, but you played there last game?
+    return false if played_that_infield_position_last_game?(selected_position, all_player_previous_game_assignments.last)
 
-    return false if player[:game_positions].include?(selected_position)
-    return false if player[:game_positions].include?("P") && selected_position == "1B"
-    return false if player[:game_positions].include?("1B") && selected_position == "P"
-    return false if player[:full_outfield?] && @outfield_positions.include?(selected_position)
+    # are you assigned {selected_infield_position}, but not everybody on the team has played there {minimum_amount_of_times} yet?
+    return false if other_teammates_have_not_played_there_equally_yet?(selected_position, player_id)
+
+    current_player_game = current_player_game_assignments(player_id)
+
+    # have you played this {selected_position} already this game?
+    return false if current_player_game[:game_positions].include?(selected_position)
+
+    # is {selected_position} P and you've already been 1B this game?
+    return false if current_player_game[:game_positions].include?("P") && selected_position == "1B"
+
+    # is {selected_position} 1B and you've already been P this game?
+    return false if current_player_game[:game_positions].include?("1B") && selected_position == "P"
+
+    # is {selected_position} in the outfield and you already played two outfield innings this game?
+    return false if current_player_game[:full_outfield?] && @outfield_positions.include?(selected_position)
+
+    # has player already played two positions in the infield in this game?
+    # return false if current_player_game[:full_infield?] && @infield_positions.include?(selected_position)
+
+    # is {selected_position} LF/LC, but you played LF/LC in a previous inning?
+    # is {selected_position} RF/RC, but you played RF/RC in a previous inning?
 
     true
   end
 
-  def current_player(player_id)
-    # take the vertical index of the 4x11 and give me a flattened array
-    # of all of that players current positions and logic this game
+  def played_that_infield_position_last_game?(selected_position, players_last_game)
+    return false if players_last_game.nil? || players_last_game.empty?
+    return false if @outfield_positions.include?(selected_position)
 
+    players_last_game_positions = players_last_game[:game_assignments].map { |plg| plg[:position] } - @outfield_positions
+    players_last_game_positions.include?(selected_position)
+  end
+
+  def other_teammates_have_not_played_there_equally_yet?(selected_position, player_id)
+    return false if @assignments.all? { |a| a[:previous_assignments].nil? }
+
+    return false if @outfield_positions.include?(selected_position)
+
+    # count up how many of the players have played that position
+    # if current player isn't in that list, then return true: other players need to be this position before they can again.
+    return true unless player_ids_in_line_to_play_position(selected_position).include?(player_id)
+
+    false
+  end
+
+  def player_ids_in_line_to_play_position(selected_position)
+    # returns an array of hashes where the player_id is matched with how many total times they've played {selected_position}
+    player_count_hash_array = @assignments.map do |a|
+      pos_count = 0
+      a[:previous_assignments].each do |pa|
+        if pa[:game_assignments].any? { |ga| ga[:position] == selected_position }
+          pos_count = pos_count + 1
+        end
+      end
+      { player_id: a[:player_id], pos_count: pos_count }
+    end
+
+    # group_by count
+    # map the values to new hashes where the count and values are in same hash
+    # sort from least to biggest
+    # get first to get the lowest entries and/or non-players in that position
+    # sort for cleanliness
+    player_count_hash_array
+      .group_by { |data| data[:pos_count] }
+      .map { |k, v| { count: k, player_ids: v.map { |h| h[:player_id] } } }
+      .sort_by { |gb| gb[:count] }
+      .first[:player_ids]
+      .sort
+  end
+
+  def current_player_game_assignments(player_id)
     player_flat_array = @assignments.find { |a| a[:player_id] == player_id }[:game_assignments]
     {
       game_positions: player_flat_array,
-      full_outfield?: (@outfield_positions & player_flat_array).size == 2
+      full_outfield?: (@outfield_positions & player_flat_array).size == 2,
+      full_infield?: (@infield_positions & player_flat_array).size === 3
     }
   end
 end
