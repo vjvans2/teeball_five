@@ -3,7 +3,7 @@ require 'date'
 
 # create fielding positions
 high_tier_positions = %w[P 1B]
-mid_tier_positions = %w[C 2B SS 3B]
+mid_tier_positions = %w[2B SS 3B]
 positions = %w[LF LC RC RF P C 1B 2B SS 3B]
 
 positions.each do |position|
@@ -57,7 +57,7 @@ Coach.create!(
   team: team
 )
 
-(1..2).each do |game_num|
+(1..10).each do |game_num|
   game = Game.create!(
     location: Faker::TvShows::Archer.location,
     is_home: true,
@@ -88,26 +88,26 @@ Coach.create!(
 end
 
 
-game = Game.create!(
-  location: Faker::TvShows::Archer.location,
-  is_home: true,
-  opponent_name: "#{Faker::TvShows::Archer.character}'s whining kids --- GAME #{3}",
-  date: Date.new(2024, 3, 3),
-  season_id: season.id
-)
+# game = Game.create!(
+#   location: Faker::TvShows::Archer.location,
+#   is_home: true,
+#   opponent_name: "#{Faker::TvShows::Archer.character}'s whining kids --- GAME #{3}",
+#   date: Date.new(2024, 3, 3),
+#   season_id: season.id
+# )
 
-# create gameday team
-gameday_team = GamedayTeam.create!(
-  game_id: game.id,
-  team_id: team.id
-)
+# # create gameday team
+# gameday_team = GamedayTeam.create!(
+#   game_id: game.id,
+#   team_id: team.id
+# )
 
-# # create gameday players
-gameday_players = []
-player_ids.each do |player_id|
-  gameday_players << GamedayPlayer.create!(
-    player_id: player_id,
-    is_present: true,
-    gameday_team_id: gameday_team.id
-  )
-end
+# # # create gameday players
+# gameday_players = []
+# player_ids.each do |player_id|
+#   gameday_players << GamedayPlayer.create!(
+#     player_id: player_id,
+#     is_present: true,
+#     gameday_team_id: gameday_team.id
+#   )
+# end
