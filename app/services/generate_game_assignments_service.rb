@@ -56,40 +56,26 @@ class GenerateGameAssignmentsService
 
       inning_index = inning - 1
 
-      begin
         # Pitcher and 1B
         FieldingPosition.high_priority.pluck(:name).shuffle.each do |hi_pos|
           player_ids = available_players(player_game_assignments, hi_pos, inning_index)
 
-          p "hi player_ids for #{hi_pos} ----------- #{player_ids}"
+          p "available_players for #{hi_pos} ----------- #{player_ids}"
+
           hi_sample = player_ids.shuffle.first
           p "hi from hi_sample ----- #{hi_sample}"
 
           players = player_game_assignments.select { |b| b[:game_assignments][inning_index].nil? }
-          p "hi from hi players ---- #{players.size}"
+          p "hi from hi players ---- #{players.map { |p| p[:player_id] }}"
 
-          if !players.map { |p| p[:player_id] }.include?(hi_sample)
-            p "poop"
-            binding.pry
-          end
-
-          found_sample = players.find { |a| a[:player_id] == hi_sample }
-          p "hi from hi found_sample ---- #{found_sample.size}"
-
-          found_sample[:game_assignments][inning_index] = hi_pos
-          p "hi from hi position assignment"
+          players.find { |a| a[:player_id] == hi_sample }[:game_assignments][inning_index] = hi_pos
         end
-      rescue => hi_error
-              binding.pry
-        p "error ---- #{hi_error}"
-      end
 
-      begin
         # Catcher and Infield
         FieldingPosition.medium_priority.pluck(:name).shuffle.each do |med_pos|
           player_ids = available_players(player_game_assignments, med_pos, inning_index)
 
-          p "med layer_ids for #{med_pos} ----------- #{player_ids}"
+          p "available_players for #{med_pos} ----------- #{player_ids}"
 
           med_sample = player_ids.shuffle.first
           p "hi from med_sample ----- #{med_sample}"
@@ -97,72 +83,47 @@ class GenerateGameAssignmentsService
           players = player_game_assignments.select { |c| c[:game_assignments][inning_index].nil? }
           p "hi from mid players ---- #{players.map { |p| p[:player_id] }}"
 
-          if !players.map { |p| p[:player_id] }.include?(med_sample)
-            p "poop"
-            binding.pry
-          end
-
-          found_sample = players.find { |d| d[:player_id] == med_sample }
-          p "hi from mid found_sample ---- #{found_sample.size}"
-
-          found_sample[:game_assignments][inning_index] = med_pos
-          p "hi from mid position assignment"
+          players.find { |d| d[:player_id] == med_sample }[:game_assignments][inning_index] = med_pos
         end
-      rescue => mid_error
-        binding.pry
-        p "error ---- #{mid_error}"
-      end
 
-      begin
         # remaining players get random outfield (logic on repeats to be added later)
         FieldingPosition.low_priority.pluck(:name).each do |low_pos|
           players_without_inning_position = player_game_assignments
             .select { |player| player[:game_assignments][inning_index].nil? }
             .map { |x| x[:player_id] }
 
-            p "low players_without_inning_position for #{low_pos} ----------- #{players_without_inning_position}"
+          p "available_players for #{low_pos} ----------- #{players_without_inning_position}"
+
           low_sample = players_without_inning_position.shuffle.first
           p "hi from low_sample ----- #{low_sample}"
 
           players = player_game_assignments.select { |f| f[:game_assignments][inning_index].nil? }
           p "hi from low players ---- #{players.map { |p| p[:player_id] }}"
 
-          if !players.map { |p| p[:player_id] }.include?(low_sample)
-            p "poop"
-            binding.pry
-          end
-
-          found_sample = players.find { |g| g[:player_id] == low_sample }
-          p "hi from low found_sample ---- #{found_sample.size}"
-
-          found_sample[:game_assignments][inning_index] = low_pos
-          p "hi from low position assignment"
+          players.find { |g| g[:player_id] == low_sample }[:game_assignments][inning_index] = low_pos
         end
-      rescue => low_error
-        binding.pry
-        p "error ---- #{low_error}"
-      end
   end
 
     player_game_assignments
   end
 
   def available_players(player_game_assignments, selected_position, inning_index)
-    all = player_ids_in_line_to_play_position(selected_position, player_game_assignments)
     already_placed = players_with_a_position_this_inning(player_game_assignments, inning_index)
+    all = player_ids_in_line_to_play_position(selected_position, player_game_assignments, already_placed)
 
-    vals = []
-    if (all - already_placed).size == 0
-      vals = (already_placed - all)
-    else
-      vals = (all - already_placed)
+    players = player_game_assignments.select { |a| (all).include?(a[:player_id]) }
+    final = []
+
+    p "--- Inning #{inning_index} --- #{selected_position} --- Potential Players #{players.map { |p| p[:player_id] }}"
+
+    players.each do |player_assignment|
+      choice = is_valid_choice?(player_assignment, selected_position, inning_index)
+      if choice[:valid]
+        final << player_assignment[:player_id]
+      else
+        p "--- Inning #{inning_index} --- Player #{player_assignment[:player_id]} INVALID for #{selected_position} because #{choice[:reason]}"
+      end
     end
-
-    players = player_game_assignments.select { |a| (vals).include?(a[:player_id]) }
-
-    final = players
-      .select { |player_assignment| is_valid_choice?(player_assignment, selected_position, inning_index) }
-      .map { |p| p[:player_id] }
 
     if final.empty?
       egg = "salad"
@@ -173,7 +134,7 @@ class GenerateGameAssignmentsService
     end
   end
 
-  def player_ids_in_line_to_play_position(selected_position, player_game_assignments)
+  def player_ids_in_line_to_play_position(selected_position, player_game_assignments, already_placed)
     # returns an array of hashes where the player_id is matched with how many total times they've played {selected_position}
     player_count_hash_array = player_game_assignments.map do |pga|
       position_count = 0
@@ -195,11 +156,17 @@ class GenerateGameAssignmentsService
     # sort from least to biggest
     # get first to get the lowest entries and/or non-players in that position
     # sort for cleanliness
-    player_count_hash_array
+    sorted_player_counts = player_count_hash_array
       .group_by { |data| data[:position_count] }
       .map { |count, player_id_values| { count: count, player_ids: player_id_values.map { |h| h[:player_id] } } }
       .sort_by { |grouped_mapped_data| grouped_mapped_data[:count] }
-      .first[:player_ids]
+
+    # there are instances where the player whose turn it is was assigned another position earlier this inning, skip and it'll work itself out
+    if (sorted_player_counts.first[:player_ids] - already_placed).empty?
+      sorted_player_counts.second[:player_ids] - already_placed
+    else
+      sorted_player_counts.first[:player_ids] - already_placed
+    end
   end
 
   def players_with_a_position_this_inning(player_game_assignments, inning_index)
@@ -209,16 +176,24 @@ class GenerateGameAssignmentsService
   end
 
   def is_valid_choice?(player_assignments, selected_position, inning_index)
-    return true if inning_index == 0 && player_assignments[:previous_assignments].empty?
+    return {valid: true, reason: nil} if inning_index == 0 && player_assignments[:previous_assignments].empty?
 
     current_player_game = current_player_game_assignments(player_assignments)
 
-    # have you played this {selected_position} already this game?
-    return false if current_player_game[:game_positions].include?(selected_position)
+    # TODO ---- handle outfield duplicates
+
+    # have you played this {selected_infield_position} already this game?
+    outfield_positions = FieldingPosition.outfield.pluck(:name)
+    return {valid: false, reason: "repeat infield"} if (current_player_game[:game_positions] - outfield_positions).include?(selected_position)
+
+    # did you play infield last inning, play outfield next
+
+    # is {selected_position} in the infield and you already played two infield innings this game?
+    infield_positions = FieldingPosition.infield.pluck(:name)
+    return {valid: false, reason: "full_infield"} if current_player_game[:full_infield?] && infield_positions.include?(selected_position)
 
     # is {selected_position} in the outfield and you already played two outfield innings this game?
-    outfield_positions = FieldingPosition.outfield.pluck(:name)
-    return false if current_player_game[:full_outfield?] && outfield_positions.include?(selected_position)
+    return {valid: false, reason: "full_outfield"} if current_player_game[:full_outfield?] && outfield_positions.include?(selected_position)
 
     # # is {selected_position} P and you've already been 1B this game?
     # return false if current_player_game[:game_positions].include?("P") && selected_position == "1B"
@@ -226,15 +201,17 @@ class GenerateGameAssignmentsService
     # # is {selected_position} 1B and you've already been P this game?
     # return false if current_player_game[:game_positions].include?("1B") && selected_position == "P"
 
-    true
+    {valid: true, reason: nil}
   end
 
   def current_player_game_assignments(player_assignments)
     player_flat_array = player_assignments[:game_assignments]
     outfield_positions = FieldingPosition.outfield.pluck(:name)
+    infield_positions = FieldingPosition.infield.pluck(:name)
     {
       game_positions: player_flat_array,
-      full_outfield?: (outfield_positions & player_flat_array).size == 2
+      full_outfield?: (outfield_positions & player_flat_array).size == 2,
+      full_infield?: (infield_positions & player_flat_array).size == 3
     }
   end
 
