@@ -1,6 +1,9 @@
 require 'faker'
 require 'date'
 
+# THIS SEED IS INTENDED TO CREATE DUMMY TESTABLE DATA
+# ONLY FIELDING POSITIONS GENERATION SHOULD EVER BE RAN IN A NON-TEST ENV
+
 # create fielding positions
 high_tier_positions = %w[P 1B]
 mid_tier_positions = %w[2B SS 3B]
