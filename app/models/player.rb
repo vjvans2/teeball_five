@@ -11,6 +11,7 @@
 #  last_name      :string
 #  leadoffs       :bigint
 #  postgame_cheer :bigint
+#  sat_out        :bigint
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  team_id        :bigint           not null
