@@ -1,6 +1,6 @@
 class PlayersController < ApplicationController
   before_action :_set_team, only: [ :new, :create ]
-  before_action :_set_player, only: [ :show, :edit, :update, :destroy ]
+  before_action :_set_player, only: [ :show, :edit, :update, :destroy, :increment, :decrement ]
 
   # GET /teams/:team_id/players/new
   def new
@@ -32,6 +32,30 @@ class PlayersController < ApplicationController
     end
   end
 
+  # PATCH/PUT /players/:id/increment/:property
+  def increment
+    property = params[:property]
+
+    if @player.respond_to?(property) && property_allowed?(property)
+      @player.increment!(property)
+      redirect_to @player
+    else
+      redirect_to @player, alert: "Invalid property."
+    end
+  end
+
+  # PATCH/PUT /players/:id/decrement/:property
+  def decrement
+    property = params[:property]
+
+    if @player.respond_to?(property) && property_allowed?(property)
+      @player.safe_decrement!(property)
+      redirect_to @player
+    else
+      redirect_to @player, alert: "Invalid property."
+    end
+  end
+
   # DELETE /players/:id
   def destroy
     team = @player.team
@@ -55,6 +79,21 @@ class PlayersController < ApplicationController
   end
 
   def _player_params
-    params.require(:player).permit(:first_name, :last_name, :jersey_number)
+    params.require(:player).permit(
+      :first_name,
+      :last_name,
+      :jersey_number,
+      :assist_out,
+      :direct_out,
+      :homeruns,
+      :leadoffs,
+      :postgame_cheer,
+      :sat_out,
+      :team_id
+      )
+  end
+
+  def property_allowed?(property)
+    %w[assist_out direct_out homeruns leadoffs postgame_cheer sat_out].include?(property)
   end
 end

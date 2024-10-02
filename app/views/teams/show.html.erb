@@ -26,24 +26,26 @@
       <th>Home Runs</th>
       <th>Lead-offs</th>
       <th>Postgame Cheers</th>
+      <th>Sat Out</th>
       <th>Actions</th>
     </tr>
   </thead>
-  <tbody>
-    <% @team.players.each do |player| %>
-      <tr>
+  <tbody >
+    <% @team.players.sort_by {|p| p[:jersey_number] }.each do |player| %>
+      <tr >
         <td><%= player.jersey_number %></td>
         <td><%= player.first_name %></td>
         <td><%= player.last_name %></td>
-        <td><%= player.assist_out %></td>
-        <td><%= player.direct_out %></td>
-        <td><%= player.homeruns %></td>
-        <td><%= player.leadoffs %></td>
-        <td><%= player.postgame_cheer %></td>
+        <td style="text-align: center"><%= player.assist_out.to_i %></td>
+        <td style="text-align: center"><%= player.direct_out.to_i %></td>
+        <td style="text-align: center"><%= player.homeruns.to_i %></td>
+        <td style="text-align: center"><%= player.leadoffs.to_i %></td>
+        <td style="text-align: center"><%= player.postgame_cheer.to_i %></td>
+        <td style="text-align: center"><%= player.sat_out.to_i %></td>
         <td>
-          <%= link_to 'Show', player_path(player), class: 'btn btn-sm btn-info' %>
-          <%= link_to 'Edit', edit_player_path(player), class: 'btn btn-sm btn-warning' %>
-          <%= link_to 'Delete', player_path(player), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-sm btn-danger' %>
+          <%= link_to 'To Player Info', player_path(player), class: 'btn btn-sm btn-info' %>
+          <%= link_to 'Edit Core Player Info', edit_player_path(player), class: 'btn btn-sm btn-warning' %>
+          <%= link_to 'Delete Player', player_path(player), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-sm btn-danger' %>
         </td>
       </tr>
     <% end %>

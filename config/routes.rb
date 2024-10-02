@@ -13,8 +13,14 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#homepage"
   resources :teams do
-    resources :players, only: [ :new, :create, :update ]
+    resources :players do
+      member do
+        put "increment/:property", to: "players#increment", as: "increment"
+        put "decrement/:property", to: "players#decrement", as: "decrement"
+      end
+    end
   end
+
   resources :players, except: [ :new, :create, :update ]
   resources :games, only: [ :index, :show, :post ]
   resources :gameday_teams, only: [ :show, :post ]
