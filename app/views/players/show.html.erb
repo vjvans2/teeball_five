@@ -1,19 +1,36 @@
 <h1><%= @player.full_name %></h1>
 
-<p>
+<div>
   <strong>Jersey Number:</strong> <%= @player.jersey_number %><br>
   <strong>First Name:</strong> <%= @player.first_name %><br>
   <strong>Last Name:</strong> <%= @player.last_name %><br>
-  <strong>Assist Outs:</strong> <%= @player.assist_out || 0 %><br>
-  <strong>Direct Outs:</strong> <%= @player.direct_out || 0 %><br>
-  <strong>Home Runs:</strong> <%= @player.homeruns || 0 %><br>
-  <strong>Lead-offs:</strong> <%= @player.leadoffs || 0 %><br>
-  <strong>Postgame Cheers:</strong> <%= @player.postgame_cheer || 0 %><br>
-  <strong>Team:</strong> <%= link_to @player.team.full_team_name, @player.team %><br>
-  <strong>Created At:</strong> <%= @player.created_at.strftime("%B %d, %Y %I:%M %p") %><br>
-  <strong>Updated At:</strong> <%= @player.updated_at.strftime("%B %d, %Y %I:%M %p") %><br>
-</p>
 
-<%= link_to 'Edit', edit_player_path(@player), class: 'btn btn-warning' %>
+  <% counters = {
+  assist_out: "Assist Outs",
+  direct_out: "Direct Outs",
+  homeruns: "Home Runs",
+  leadoffs: "Lead-offs",
+  postgame_cheer: "Postgame Cheer",
+  sat_out: "Games Sat Out"
+} %>
+
+  <% counters.each do |property, label| %>
+    <div id="<%= property %>" style="display: flex; align-items: center;">
+      <strong><%= label %>:</strong>
+      <span style="margin-left: 10px;"><%= @player.send(property).to_i %></span> &nbsp;
+      <span style="float:left">
+        <%= button_to '+', increment_team_player_path(@player, property: property), method: :put, class: 'btn btn-success', style: 'display: inline-block; margin-right: 5px;' %>
+      </span>
+      <span style="float:right">
+        <%= button_to '-', decrement_team_player_path(@player, property: property), method: :put, class: 'btn btn-danger', style: 'display: inline-block;' %>
+      </span>
+    </div><br>
+  <% end %>
+
+  <strong>Team:</strong> <%= link_to @player.team.full_team_name, @player.team %><br>
+  <strong>Most Recently Updated At:</strong> <%= @player.updated_at.strftime("%B %d, %Y %I:%M %p") %><br>
+</div>
+
+<%= link_to 'Edit Core Player Info', edit_player_path(@player), class: 'btn btn-warning' %>
 <%= link_to 'Delete', player_path(@player), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: "btn btn-danger" %>
 <%= link_to 'Back to Team', @player.team, class: 'btn btn-secondary' %>

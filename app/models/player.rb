@@ -34,4 +34,17 @@ class Player < ApplicationRecord
   def full_name
     "#{first_name} #{last_name}"
   end
+
+  def safe_decrement!(property)
+    # Check if the property exists and is a valid numeric field
+    if self.respond_to?(property) && self.send(property).is_a?(Numeric)
+      current_value = self.send(property)
+      # Decrement only if the current value is greater than 0
+      if current_value > 0
+        self.update(property => [ current_value - 1, 0 ].max)
+      end
+    else
+      raise ArgumentError, "Invalid property or not a numeric field"
+    end
+  end
 end
