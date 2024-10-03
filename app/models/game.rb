@@ -20,13 +20,24 @@
 #  fk_rails_...  (season_id => seasons.id)
 #
 class Game < ApplicationRecord
-  # has_many :innings, optional: true
   has_many :coaches
   has_many :player_innings, dependent: :destroy
   has_one :gameday_team
   belongs_to :season
 
-  def full_team_name
-    "#{city} #{name}"
+  def pretty_date
+    date.strftime("%B %d, %Y, %I:%M %p")
+  end
+
+  def name
+    "#{pretty_date} --- #{season.team.full_team_name}"
+  end
+
+  def full_legal_game_name
+    "#{name} vs. #{opponent_name} (#{is_home ? 'HOME' : 'AWAY'})"
+  end
+
+  def game_assignments
+    GameAssignmentsService.new(gameday_team).retrieve_prior_game_assignments(id)
   end
 end
