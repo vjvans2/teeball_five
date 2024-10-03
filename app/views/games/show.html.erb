@@ -1,2 +1,26 @@
-<h1>Games#show</h1>
-<%= @game.inspect %>
+<h1><%= @game.name%> Assignments</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center; border: 1px solid black; padding: 8px;">Batting Order</th>
+      <th style="text-align: center; border: 1px solid black; padding: 8px;">Player</th>
+      <th style="text-align: center; border: 1px solid black; padding: 8px;">#</th>
+      <% 1.upto(4) do |inning| %>
+        <th style="text-align: center; border: 1px solid black; padding: 8px;">Inning <%= inning %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% @game.game_assignments.each do |player_data| %>
+      <tr>
+        <td style="text-align: center; border: 1px solid black; padding: 8px;";><%= player_data[:batting_order] %></td>
+        <td style="text-align: center; border: 1px solid black; padding: 8px;";><%= player_data[:player][:name] %></td>
+        <td style="text-align: center; border: 1px solid black; padding: 8px;";><%= player_data[:player][:jersey_number] %></td>
+        <% player_data[:game_assignments].each do |assignment| %>
+          <td style="text-align: center; border: 1px solid black; padding: 8px;";><%= assignment[:position] %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

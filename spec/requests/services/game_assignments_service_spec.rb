@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe GenerateGameAssignmentsService, type: :service do
+RSpec.describe GameAssignmentsService, type: :service do
   xdescribe '#generate_game_assignments' do
     context 'when params are valid' do
       let(:valid_params) { { name: 'Test User', email: 'test@example.com', password: 'password', password_confirmation: 'password' } }
