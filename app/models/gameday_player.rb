@@ -25,4 +25,21 @@ class GamedayPlayer < ApplicationRecord
 
   # TODO -- this will need to be restricted by game/season
   has_many :player_innings, through: :player
+
+
+  # in a ten person team with an assumed shifting rotation
+  # -- positions 1, 2, 3, 4  will leadoff (in order)
+  # -- positions 10, 1, 2, 3 will homerun
+  # we'll start with just going by leadoff to start
+
+  # the mapping and shuffling maintains the hierarchy and randomizes those in the groups
+  def self.shuffle_by_leadoff(gameday_players)
+    sorted = gameday_players.sort_by { |gdp| gdp.player[:leadoffs] }
+    sorted.group_by { |s| s.player[:leadoffs] }.values.flat_map(&:shuffle)
+  end
+
+  # def self.shuffle_by_homerun(gameday_players)
+  #   sorted = gameday_players.sort_by { |gdp| gdp.player[:homeruns] }
+  #   sorted.group_by { |s| s[:homeruns] }.values.flat_map(&:shuffle)
+  # end
 end

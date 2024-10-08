@@ -11,9 +11,11 @@ class GameAssignmentsService
   def generate_game_assignments
     assignments = generate_player_game_assignments(initial_assignments)
 
-    save_player_inning_assignments(assignments)
+    write_overrides_to_log
 
-    p "Final Override Counter ---- #{@override_counter}"
+    save_player_inning_assignments(assignments)
+    save_player_counters(assignments)
+
     assignments
   end
 
@@ -42,14 +44,18 @@ class GameAssignmentsService
 
   private
 
+
   def initial_assignments
     list = Array.new(@number_of_gameday_players)
     empty_innings = Array.new(@number_of_innings) { nil }
 
-    # "shuffle" will eventually be modified to take into player leadoffs/hrs
-    @gameday_team.gameday_players.shuffle.each_with_index do |gameday_player, index|
+    # shuffle_by_leadoff to get the primary leadoffs/hr
+    # but still need to do a check on the 10th/final batter to get the non-leadoff-hr
+    GamedayPlayer.shuffle_by_leadoff(@gameday_team.gameday_players).each_with_index do |gameday_player, index|
       list[index] = {
         player_id: gameday_player.player_id,
+        leadoffs: gameday_player.player.leadoffs,
+        homeruns: gameday_player.player.homeruns,
         game_assignments: empty_innings.dup,
         previous_assignments:  player_previous_assignments(gameday_player)
       }
@@ -258,6 +264,37 @@ class GameAssignmentsService
           game_id: game_id
         )
       end
+    end
+  end
+
+  def save_player_counters(player_game_assignments)
+    # save the leadoffs, homeruns preset from the assignments here
+
+    # grab the players from {gameday_team.team_size_leadoff_homerun_chart} and pluck their player_ids
+    # to increment leadoffs and homeruns
+    # since 10 players mvp/default
+    leadoffs = player_game_assignments.first(4).map { |leadoff| leadoff[:player_id] }
+    homeruns = player_game_assignments.first(3).map { |hr| hr[:player_id] }
+    homeruns << player_game_assignments.last[:player_id]
+
+    leadoffs.each do |leadoff_player_id|
+      Player.find(leadoff_player_id).increment!(:leadoffs)
+    end
+
+    homeruns.each do |homerun_player_id|
+      Player.find(homerun_player_id).increment!(:homeruns)
+    end
+  end
+
+  def write_overrides_to_log
+    File.open("teeball_log.txt", "a") do |file|
+      file.write("TIME ----- #{Time.now.strftime("%B %d, %Y %I:%M %p")}" + "\n")
+
+      @override_log.each do |log|
+        file.write(log + "\n")
+      end
+
+      file.write("Final Override Counter ---- #{@override_counter}" + "\n")
     end
   end
 end
