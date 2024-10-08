@@ -3,15 +3,15 @@
 # Table name: players
 #
 #  id             :bigint           not null, primary key
-#  assist_out     :bigint
-#  direct_out     :bigint
+#  assist_out     :bigint           default(0), not null
+#  direct_out     :bigint           default(0), not null
 #  first_name     :string
-#  homeruns       :bigint
+#  homeruns       :bigint           default(0), not null
 #  jersey_number  :integer
 #  last_name      :string
-#  leadoffs       :bigint
-#  postgame_cheer :bigint
-#  sat_out        :bigint
+#  leadoffs       :bigint           default(0), not null
+#  postgame_cheer :bigint           default(0), not null
+#  sat_out        :bigint           default(0), not null
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  team_id        :bigint           not null

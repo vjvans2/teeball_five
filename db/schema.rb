@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_20_005856) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_08_173515) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -93,12 +93,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_20_005856) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "team_id", null: false
-    t.bigint "leadoffs"
-    t.bigint "homeruns"
-    t.bigint "postgame_cheer"
-    t.bigint "direct_out"
-    t.bigint "assist_out"
-    t.bigint "sat_out"
+    t.bigint "leadoffs", default: 0, null: false
+    t.bigint "homeruns", default: 0, null: false
+    t.bigint "postgame_cheer", default: 0, null: false
+    t.bigint "direct_out", default: 0, null: false
+    t.bigint "assist_out", default: 0, null: false
+    t.bigint "sat_out", default: 0, null: false
     t.index ["team_id"], name: "index_players_on_team_id"
   end
 

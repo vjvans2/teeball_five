@@ -85,7 +85,7 @@ Coach.create!(
     )
   end
 
-  GenerateGameAssignmentsService.new(gameday_team).generate_game_assignments
+  GameAssignmentsService.new(gameday_team).generate_game_assignments
 
   p "----- GAME #{game_num} PLAYERINNINGS CREATED -----"
 end
