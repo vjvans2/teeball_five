@@ -42,4 +42,7 @@ class GamedayPlayer < ApplicationRecord
   #   sorted = gameday_players.sort_by { |gdp| gdp.player[:homeruns] }
   #   sorted.group_by { |s| s[:homeruns] }.values.flat_map(&:shuffle)
   # end
+  # 
+  
+  
 end
