@@ -4,24 +4,23 @@ RSpec.describe Assignable do
   let(:assignable_class) { Class.new { include Assignable } }
   let(:assignable_instance) { assignable_class.new }
 
-  describe '#initial_assignments' do
-    let!(:fielding_positions) do
-      high_tier_positions = %w[P 1B]
-      mid_tier_positions = %w[2B SS 3B]
-      positions = %w[LF LC RC RF P C 1B 2B SS 3B]
-
-      positions.each do |position|
-        rank = case position
-        when *high_tier_positions
-            1
-        when *mid_tier_positions
-            2
-        else
-            3
-        end
-        create(:fielding_position, name: position, hierarchy_rank: rank)
+  def create_fielding_positions
+    positions = %w[LF LC RC RF P C 1B 2B SS 3B]
+    positions.each do |position|
+      rank = case position
+      when 'P', '1B' then 1
+      when '2B', 'SS', '3B' then 2
+      else 3
       end
+      create(:fielding_position, name: position, hierarchy_rank: rank)
     end
+  end
+
+  before do
+    create_fielding_positions
+  end
+
+  describe '#initial_assignments' do
     let(:team) { create(:team) }
     let(:game) { create(:game) }
     let(:gameday_team) { create(:gameday_team, team: team, game: game) }
@@ -76,23 +75,6 @@ RSpec.describe Assignable do
   end
 
   describe '#player_previous_assignments' do
-  let!(:fielding_positions) do
-    high_tier_positions = %w[P 1B]
-    mid_tier_positions = %w[2B SS 3B]
-    positions = %w[LF LC RC RF P C 1B 2B SS 3B]
-
-    positions.each do |position|
-      rank = case position
-      when *high_tier_positions
-          1
-      when *mid_tier_positions
-          2
-      else
-          3
-      end
-      create(:fielding_position, name: position, hierarchy_rank: rank)
-    end
-  end
     let(:player) { create(:player) }
     let(:team) { create(:team) }
     let(:game) { create(:game) }
