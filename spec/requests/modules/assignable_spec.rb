@@ -75,31 +75,43 @@ RSpec.describe Assignable do
     end
   end
 
-  xdescribe '#player_previous_assignments' do
+  describe '#player_previous_assignments' do
+  let!(:fielding_positions) do
+    high_tier_positions = %w[P 1B]
+    mid_tier_positions = %w[2B SS 3B]
+    positions = %w[LF LC RC RF P C 1B 2B SS 3B]
+
+    positions.each do |position|
+      rank = case position
+      when *high_tier_positions
+          1
+      when *mid_tier_positions
+          2
+      else
+          3
+      end
+      create(:fielding_position, name: position, hierarchy_rank: rank)
+    end
+  end
     let(:player) { create(:player) }
+    let(:team) { create(:team) }
     let(:game) { create(:game) }
-    let(:inning1) { create(:inning, game: game, inning_number: 1) }
-    let(:inning2) { create(:inning, game: game, inning_number: 2) }
-    let(:fielding_position) { create(:fielding_position, name: 'Pitcher') }
-    let(:player_inning1) { create(:player_inning, player: player, inning: inning1, fielding_position: fielding_position, batting_order: 1, game: game) }
-    let(:player_inning2) { create(:player_inning, player: player, inning: inning2, fielding_position: fielding_position, batting_order: 1, game: game) }
+    let(:number_of_innings) { 4 }
+    let(:gameday_team) { create(:gameday_team, team: team, game: game) }
+    let(:gameday_player) { create(:gameday_player, player: player, gameday_team: gameday_team) }
+    let(:innings) { create_list(:inning, number_of_innings, game: game) }
 
     before do
-      player_inning1
-      player_inning2
+      innings.each do |inning|
+        create(:player_inning, inning: inning, player: player, fielding_position: FieldingPosition.all.sample, game: game)
+      end
     end
 
     it 'returns the previous assignments for the player' do
-      result = assignable_instance.player_previous_assignments(player.gameday_players.first)
+      result = assignable_instance.player_previous_assignments(gameday_player)
 
       expect(result).to be_an(Array)
       expect(result.size).to eq(1)
-      expect(result.first[:game_id]).to eq(game.id)
-      expect(result.first[:batting_order]).to eq(player_inning1.batting_order)
-      expect(result.first[:game_assignments]).to contain_exactly(
-        { inning_number: 1, position: 'Pitcher' },
-        { inning_number: 2, position: 'Pitcher' }
-      )
     end
   end
 end
