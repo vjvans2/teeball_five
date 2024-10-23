@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :inning do
-    inning_number { 1 }
-    game { build(:game) }
+    inning_number { |n| n }
+    association :game
   end
 end

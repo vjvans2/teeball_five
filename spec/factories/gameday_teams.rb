@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :gameday_team do
-    game { build(:game) }
-    team { build(:team) }
+    association :game
+    association :team
   end
 end

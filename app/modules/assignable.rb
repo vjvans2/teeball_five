@@ -6,6 +6,7 @@ module Assignable
     GamedayPlayer.shuffle_by_leadoff(gameday_team.gameday_players).each_with_index do |gameday_player, index|
       list[index] = {
         player_id: gameday_player.player_id,
+        player_name: gameday_player.player.full_name,
         leadoffs: gameday_player.player.leadoffs,
         homeruns: gameday_player.player.homeruns,
         game_assignments: empty_innings.dup,
