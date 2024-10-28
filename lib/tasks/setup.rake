@@ -6,13 +6,13 @@ namespace :project do
 
     # 1. Install gem dependencies
     puts "Installing dependencies..."
-    system('bundle install')
+    system("bundle install")
 
     # 2. Set up the database
     puts "Setting up the database..."
-    system('rails db:create')
-    system('rails db:migrate')
-    system('rails db:seed')
+    system("rails db:create")
+    system("rails db:migrate")
+    system("rails db:seed")
 
     puts "Project setup complete!"
   end

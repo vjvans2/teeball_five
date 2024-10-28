@@ -12,7 +12,7 @@ RSpec.describe Coach, type: :model do
   describe "#full_name" do
     subject { coach.full_name }
 
-    let(:coach) { build(:coach, :first_name => first_name, :last_name => last_name) }
+    let(:coach) { build(:coach, first_name: first_name, last_name: last_name) }
     let(:first_name) { "Nicholas" }
     let(:last_name) { "Turon" }
 

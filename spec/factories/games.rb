@@ -1,9 +1,17 @@
 FactoryBot.define do
   factory :game do
-    date { Date.new(2024, 3, 31) }
-    is_home { false }
+    date { Date.today }
+    is_home { true }
     location { "Over the Rainbow" }
-    opponent_name { "Base Invators" }
-    season { build(:season) }
+    opponent_name { "Base Invaders" }
+    association :season
+
+    transient do
+      inning_count { 4 }
+    end
+
+    after(:create) do |game, evaluator|
+      create_list(:inning, evaluator.inning_count, game: game)
+    end
   end
 end

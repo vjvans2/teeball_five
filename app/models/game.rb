@@ -21,7 +21,7 @@
 #
 class Game < ApplicationRecord
   has_many :coaches
-  has_many :player_innings, dependent: :destroy
+  has_many :innings
   has_one :gameday_team
   belongs_to :season
 

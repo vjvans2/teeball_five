@@ -16,10 +16,10 @@ namespace :db do
 
   desc "TRUNCATE all tables and then runs the SEED for inital data"
   task :ts do
-    Rake::Task['db:truncate_all_tables'].invoke
+    Rake::Task["db:truncate_all_tables"].invoke
     p "----- TRUNCATION COMPLETE -----"
 
-    Rake::Task['db:seed'].invoke
+    Rake::Task["db:seed"].invoke
     p "----- SEED COMPLETE -----"
     p "----- COMBINED RAKE TASK COMPLETE -----"
   end

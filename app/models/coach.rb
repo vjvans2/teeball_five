@@ -23,7 +23,7 @@
 #
 class Coach < ApplicationRecord
   belongs_to :team
-  belongs_to :associated_player, class_name: 'Player', foreign_key: 'associated_player_id', optional: true
+  belongs_to :associated_player, class_name: "Player", foreign_key: "associated_player_id", optional: true
 
   def full_name
     "#{first_name} #{last_name}"

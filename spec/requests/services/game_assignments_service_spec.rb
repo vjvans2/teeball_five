@@ -2,14 +2,19 @@ require 'rails_helper'
 
 RSpec.describe GameAssignmentsService, type: :service do
   xdescribe '#generate_game_assignments' do
+    let(:team) { create(:team) }
+    let(:game) { create(:game) }
+    let(:gameday_team) { create(:gameday_team, team: team, game: game) }
+    let(:number_of_gameday_players) { 10 }
+    let(:number_of_innings) { 4 }
+    !let(:players) { create_list(:player, number_of_gameday_players, team: team) }
+    !let(:gameday_players) { players.map { |player| create(:gameday_player, player: player, gameday_team: gameday_team) } }
+
     context 'when params are valid' do
-      let(:valid_params) { { name: 'Test User', email: 'test@example.com', password: 'password', password_confirmation: 'password' } }
-
       it 'creates player_innings correctly' do
-        result = GenerateGameAssignmentsService.new(valid_params).generate_game_assignments
+        result = GameAssignmentsService.new(gameday_team).generate_game_assignments
 
-        expect(result[:success]).to be_truthy
-        expect(result[:user]).to be_persisted
+        expect(result).not_to eq nil
       end
     end
   end

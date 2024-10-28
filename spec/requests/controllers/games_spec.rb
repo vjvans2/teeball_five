@@ -3,7 +3,8 @@ require 'date'
 
 RSpec.describe GamesController, type: :controller do
   describe "GET /show" do
-    let(:game) { Game.create!(location: 'location', is_home: true, opponent_name: 'opponent', date: Date.today) }
+    let(:season) { create(:season) }
+    let(:game) { create(:game, season: season) }
 
     it "returns http success" do
       get :show, params: { id: game.id }

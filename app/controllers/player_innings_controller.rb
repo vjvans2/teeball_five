@@ -1,5 +1,5 @@
 class PlayerInningsController < ApplicationController
   def post
-    PlayerInningsService.new(params)
+    render status: :ok
   end
 end
