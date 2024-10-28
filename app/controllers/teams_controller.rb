@@ -20,7 +20,7 @@ class TeamsController < ApplicationController
   def create
     @team = Team.new(_team_params)
     if @team.save
-      redirect_to @team, notice: 'Team was successfully created.'
+      redirect_to @team, notice: "Team was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -32,7 +32,7 @@ class TeamsController < ApplicationController
   # PATCH/PUT /teams/:id
   def update
     if @team.update(_team_params)
-      redirect_to @team, notice: 'Team was successfully updated.'
+      redirect_to @team, notice: "Team was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -42,10 +42,10 @@ class TeamsController < ApplicationController
   def destroy
     if @team.destroy
       Rails.logger.info("Team #{@team.id} was successfully deleted")
-      redirect_to teams_url, notice: 'Team was successfully deleted.'
+      redirect_to teams_url, notice: "Team was successfully deleted."
     else
       Rails.logger.error("Failed to delete team #{@team.id}")
-      redirect_to teams_url, alert: 'Team could not be deleted.'
+      redirect_to teams_url, alert: "Team could not be deleted."
     end
   end
 
