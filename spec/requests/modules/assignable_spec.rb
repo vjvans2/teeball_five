@@ -22,10 +22,10 @@ RSpec.describe Assignable do
 
   describe '#initial_assignments' do
     let(:team) { create(:team) }
-    let(:game) { create(:game) }
+    let(:number_of_innings) { 4 }
+    let(:game) { create(:game, inning_count: number_of_innings) }
     let(:gameday_team) { create(:gameday_team, team: team, game: game) }
     let(:number_of_gameday_players) { 10 }
-    let(:number_of_innings) { 4 }
     let(:players) { create_list(:player, number_of_gameday_players, team: team) }
     let(:gameday_players) { players.map { |player| create(:gameday_player, player: player, gameday_team: gameday_team) } }
 
@@ -49,7 +49,7 @@ RSpec.describe Assignable do
     end
 
     context "when this is not the first game of the season" do
-      let(:innings) { create_list(:inning, number_of_innings, game: game) }
+      let!(:innings) { game.innings }
       before do
         players.each do |player|
           innings.each do |inning|
@@ -77,11 +77,11 @@ RSpec.describe Assignable do
   describe '#player_previous_assignments' do
     let(:player) { create(:player) }
     let(:team) { create(:team) }
-    let(:game) { create(:game) }
     let(:number_of_innings) { 4 }
+    let(:game) { create(:game, inning_count: number_of_innings) }
     let(:gameday_team) { create(:gameday_team, team: team, game: game) }
     let(:gameday_player) { create(:gameday_player, player: player, gameday_team: gameday_team) }
-    let(:innings) { create_list(:inning, number_of_innings, game: game) }
+    let(:innings) { game.innings }
 
     before do
       innings.each do |inning|
