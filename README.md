@@ -17,4 +17,9 @@ I'm getting a "Could not find a JavaScript runtime" error because I'm on Windows
 sudo apt-get install nodejs
 ```
 
+Run the cop
+```bash
+rubocop -A 
+```
+
 Navigate to <a>localhost:3000</a>
