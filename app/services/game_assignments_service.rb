@@ -20,7 +20,7 @@ class GameAssignmentsService
 
     write_overrides_to_log(@override_counter, @override_log)
 
-    save_player_inning_assignments(assignments)
+    save_player_inning_assignments(assignments, @gameday_team.game_id, @number_of_innings)
     save_player_counters(assignments)
 
     assignments
