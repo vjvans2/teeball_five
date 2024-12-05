@@ -1,4 +1,6 @@
 module GameAssignmentGenerator
+  include PlayersAvailable
+
   def generate_player_game_assignments(player_game_assignments, number_of_innings, override_log, override_counter)
     (1..number_of_innings).each do |inning|
       inning_index = inning - 1
