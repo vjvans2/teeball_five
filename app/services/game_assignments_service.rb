@@ -16,7 +16,7 @@ class GameAssignmentsService
 
   def generate_game_assignments
     initialized = initial_assignments(@gameday_team, @number_of_gameday_players, @number_of_innings)
-    assignments = generate_player_game_assignments(initialized, @number_of_innings, @override_counter, @override_log)
+    assignments = generate_player_game_assignments(initialized, @number_of_innings, @override_log, @override_counter)
 
     write_overrides_to_log(@override_counter, @override_log)
 
