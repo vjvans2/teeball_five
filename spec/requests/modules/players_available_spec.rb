@@ -19,19 +19,6 @@ RSpec.describe PlayersAvailable do
   before do
     create_fielding_positions
   end
-  # let(:team) { create(:team) }
-  # let(:number_of_innings) { 4 }
-  # let(:game) { create(:game, inning_count: number_of_innings) }
-  # let(:number_of_players) { 10 }
-  # let(:players) { create_list(:player, number_of_players, team: team).sort }
-  # let(:player_game_assignments) do
-  #   players.map do |player|
-  #     {
-  #       player_id: player.id,
-  #       game_assignments: [ '1B', '2B', 'LF', 'RF' ]
-  #     }
-  #   end
-  # end
 
   describe '#current_player_game_assignments' do
     let(:game_assignments) { [ 'LF', nil, nil, nil ] }
@@ -192,29 +179,124 @@ RSpec.describe PlayersAvailable do
     end
   end
 
-  describe '#players_ids_in_line_to_play_position' do
-    context 'when given a position' do
-      it 'gives an ordered list of player_ids whose \'turn\' it is to be {position}' do
+  describe '#player_ids_in_line_to_play_position' do
+    let(:selected_position) { 'LF' }
+    let(:player_game_assignments) do
+      [
+        { player_id: 1, previous_assignments: [ { game_assignments: [ { position: 'LF' } ] } ], game_assignments: [] },
+        { player_id: 2, previous_assignments: [], game_assignments: [] },
+        { player_id: 3, previous_assignments: [ { game_assignments: [ { position: 'RF' } ] } ], game_assignments: [ 'LF' ] }
+      ]
+    end
+    let(:already_placed) { [ 3 ] }
+    let(:result) do
+      players_available_instance.player_ids_in_line_to_play_position(
+        selected_position,
+        player_game_assignments,
+        already_placed
+      )
+    end
+    context 'when previous_assignments and already_placed add limits' do
+      it 'returns player 2 as only eligible player for the position' do
+        expect(result).to eq([ 2 ]) # Player 2 has never played LF, Player 1 has once.  Player 3 is already placed.
+      end
+    end
+
+    context 'when previous_assignments present only' do
+      let(:player_game_assignments) do
+        [
+          { player_id: 1, previous_assignments: [ { game_assignments: [ { position: 'LF' } ] } ], game_assignments: [] },
+          { player_id: 2, previous_assignments: [], game_assignments: [] },
+          { player_id: 3, previous_assignments: [ { game_assignments: [ { position: 'RF' } ] } ], game_assignments: [] }
+        ]
+      end
+      let(:already_placed) { [] }
+      let(:result) do
+        players_available_instance.player_ids_in_line_to_play_position(
+          selected_position,
+          player_game_assignments,
+          already_placed
+        )
+      end
+      it 'returns players 2 and 3 as eligible' do
+        expect(result).to eq([ 2, 3 ])
       end
     end
   end
 
   describe '#filter_valid_players' do
-    context 'when there are valid_players' do
-      it 'provides a list of player_ids that are valid for the given position' do
+    let(:player_game_assignments) do
+      [
+        { player_id: 1, previous_assignments: [], game_assignments: [] },
+        { player_id: 2, previous_assignments: [], game_assignments: [ 'LF' ] }
+      ]
+    end
+    let(:player_ids) { [ 1, 2 ] }
+    let(:position) { 'LF' }
+    let(:inning_index) { 0 }
+    let(:override_log) { [] }
+    let(:override_counter) { 0 }
+    let(:result) do
+      players_available_instance.filter_valid_players(
+        player_game_assignments,
+        player_ids,
+        position,
+        inning_index,
+        override_log,
+        override_counter
+      )
+    end
+
+    context 'when there are valid players' do
+      it 'returns a list of valid player_ids' do
+        expect(result).to include(1) # Player 1 has no previous assignments and is valid.
       end
     end
-    context 'when there are no valid_players' do
-      it 'logs the invalid_players\' messages' do
-      end
-      it 'returns a list of the invalid player_ids' do
+
+    context 'when there are no valid players' do
+      let(:player_ids) { [ 2 ] } # Only player 2, who has already played LF, is considered.
+      it 'returns a list of invalid player_ids' do
+        expect(result).to eq([ 2 ])
       end
     end
   end
 
   describe '#available_players' do
-    context 'when a position, inning, and player_game_assignments are provided' do
-      it 'returns a list of valid_players that could play that position in that inning' do
+    let(:player_game_assignments) do
+      [
+        { player_id: 1, previous_assignments: [], game_assignments: [] },
+        { player_id: 2, previous_assignments: [], game_assignments: [ 'LF' ] }
+      ]
+    end
+    let(:selected_position) { 'LF' }
+    let(:inning_index) { 0 }
+    let(:override_log) { [] }
+    let(:override_counter) { 0 }
+    let(:result) do
+      players_available_instance.available_players(
+        player_game_assignments,
+        selected_position,
+        inning_index,
+        override_log,
+        override_counter
+      )
+    end
+
+    context 'when not all players are already placed' do
+      it 'returns a list of valid players for the position' do
+        expect(result).to eq([ 1 ]) # Player 1 is valid for LF.
+      end
+    end
+
+    context 'when all players are already placed' do
+      let(:player_game_assignments) do
+        [
+          { player_id: 1, previous_assignments: [], game_assignments: [ 'LF' ] },
+          { player_id: 2, previous_assignments: [], game_assignments: [ 'LF' ] }
+        ]
+      end
+      it 'returns an empty list' do
+        expect(result).to be_empty
       end
     end
   end
