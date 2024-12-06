@@ -27,5 +27,9 @@ module GameAssignmentGenerator
 
     selected_player_id = player_ids.shuffle.first
     player_game_assignments.find { |a| a[:player_id] == selected_player_id }[:game_assignments][inning_index] = position
+    {
+      selected_player_id: selected_player_id,
+      position: position
+    }
   end
 end
