@@ -35,12 +35,43 @@ RSpec.describe GameAssignmentGenerator do
     create_fielding_positions
   end
 
+  describe '#generate_player_game_assignments' do
+    let(:override_log) { [] }
+    let(:override_counter) { 0 }
+    let(:player_game_assignments) do
+      create_initial_assignments(gameday_team, number_of_gameday_players, number_of_innings)
+    end
+    let(:result) do
+      gag_instance.generate_player_game_assignments(
+        player_game_assignments,
+        number_of_innings,
+        override_log,
+        override_counter
+      )
+    end
+
+    context 'when an empty player_game_assignments is provided' do
+      it 'initially has {number_of_innings} nil game_assignments in the array' do
+        player_game_assignments.each do |pga|
+          expect(pga[:game_assignments].all?(&:nil?)).to eq true
+          expect(pga[:game_assignments].size).to eq number_of_innings
+        end
+      end
+
+      it 'fully populates the player_game_assignments' do
+        result.each do |r|
+          expect(r[:game_assignments].all?(&:present?)).to eq true
+          expect(r[:game_assignments].size).to eq number_of_innings
+        end
+      end
+    end
+  end
+
   describe '#assign_position' do
     let(:position) { "LF" }
     let(:inning_index) { 0 }
     let(:override_log) { [] }
     let(:override_counter) { 0 }
-    let(:game_assignments) { [ 'LF', nil, nil, nil ] }
     let(:player_assignments) do
       create_initial_assignments(gameday_team, number_of_gameday_players, number_of_innings)
     end
