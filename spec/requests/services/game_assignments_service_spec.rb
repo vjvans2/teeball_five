@@ -43,6 +43,16 @@ RSpec.describe GameAssignmentsService, type: :service do
     create_prior_game_assignments
   end
 
+  describe '#generate_game_assignments' do
+    context 'when a gameday_team is provided' do
+      it 'generates a games worth of assignments' do
+        result = GameAssignmentsService.new(gameday_team).generate_game_assignments
+        expect(result).not_to eq nil
+        expect(result.size).to eq number_of_gameday_players
+      end
+    end
+  end
+
   describe '#retrieve_prior_game_assignments' do
     context 'when a previous game_id is provided' do
       it 'retrieves and formats the game data' do
