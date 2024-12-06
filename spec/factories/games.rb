@@ -11,7 +11,9 @@ FactoryBot.define do
     end
 
     after(:create) do |game, evaluator|
-      create_list(:inning, evaluator.inning_count, game: game)
+      (1..evaluator.inning_count).each do |num|
+        create(:inning, inning_number: num, game: game)
+      end
     end
   end
 end

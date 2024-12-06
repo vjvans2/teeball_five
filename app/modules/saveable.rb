@@ -1,8 +1,7 @@
 module Saveable
-  def save_player_inning_assignments(player_game_assignments)
-    game_id = @gameday_team.game_id
-    (1..@number_of_innings).each do |inning_number|
-      inning = Inning.create!(game_id: game_id, inning_number: inning_number)
+  def save_player_inning_assignments(player_game_assignments, game_id, number_of_innings)
+    (1..number_of_innings).each do |inning_number|
+      inning = Inning.find_or_create_by!(game_id: game_id, inning_number: inning_number)
       player_game_assignments.each_with_index do |player, batting_order_index|
         inning_fielding_position_id = FieldingPosition.find_by_name(player[:game_assignments][inning_number - 1]).id
         PlayerInning.create!(

@@ -1,16 +1,16 @@
 module PlayersAvailable
   include Loggable
 
-  def available_players(player_game_assignments, selected_position, inning_index)
+  def available_players(player_game_assignments, selected_position, inning_index, override_log, override_counter)
     already_placed = players_with_a_position_this_inning(player_game_assignments, inning_index)
 
     return [] if already_placed.size == player_game_assignments.size
 
     eligible_players = player_ids_in_line_to_play_position(selected_position, player_game_assignments, already_placed)
-    filter_valid_players(player_game_assignments, eligible_players, selected_position, inning_index)
+    filter_valid_players(player_game_assignments, eligible_players, selected_position, inning_index, override_log, override_counter)
   end
 
-  def filter_valid_players(player_game_assignments, player_ids, position, inning_index)
+  def filter_valid_players(player_game_assignments, player_ids, position, inning_index, override_log, override_counter)
     valid_players = []
     invalid_players = []
 
@@ -26,7 +26,7 @@ module PlayersAvailable
     end
 
     if valid_players.empty?
-      log_override(invalid_players)
+      log_override(invalid_players, override_log, override_counter)
       invalid_players.map { |player| player[:player_id] }
     else
       valid_players
