@@ -9,6 +9,7 @@ module Assignable
         player_name: gameday_player.player.full_name,
         leadoffs: gameday_player.player.leadoffs,
         homeruns: gameday_player.player.homeruns,
+        sit_outs: gameday_player.player.sat_out,
         game_assignments: empty_innings.dup,
         previous_assignments: player_previous_assignments(gameday_player)
       }
