@@ -22,4 +22,10 @@ Run the cop
 rubocop -A 
 ```
 
+"I'm ready to test some things"
+```bash
+rake db:ts
+```
+Truncates the tables and then runs the seed command.
+
 Navigate to <a>localhost:3000</a>

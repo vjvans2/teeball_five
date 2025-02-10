@@ -32,7 +32,7 @@ season = Season.create!(team_id: team.id, name: 'Test Season 1')
 
 # create ten players
 player_ids = []
-(1..10).each do |jersey_num|
+(1..12).each do |jersey_num|
   new_player = Player.create!(
       first_name: Faker::Name.first_name,
       last_name: Faker::Name.last_name,
