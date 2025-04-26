@@ -24,15 +24,15 @@ end
 
 # create a team
 team = Team.create!(
-  name: 'Sharks',
-  city: 'Westerville'
+  name: 'Pirates',
+  city: '8U WYBSL Coach Pitch'
 )
 
-season = Season.create!(team_id: team.id, name: 'Test Season 1')
+season = Season.create!(team_id: team.id, name: 'WYBSL Spring 25')
 
-# create ten players
+# create thirteen players
 player_ids = []
-(1..12).each do |jersey_num|
+(1..13).each do |jersey_num|
   new_player = Player.create!(
       first_name: Faker::Name.first_name,
       last_name: Faker::Name.last_name,
@@ -60,7 +60,8 @@ Coach.create!(
   team: team
 )
 
-(1..10).each do |game_num|
+# (1..10).each do |game_num|
+  game_num = 1
   game = Game.create!(
     location: Faker::TvShows::Archer.location,
     is_home: true,
@@ -85,10 +86,10 @@ Coach.create!(
     )
   end
 
-  GameAssignmentsService.new(gameday_team).generate_game_assignments
+  GameAssignmentsService.new(gameday_team, 6).generate_game_assignments
 
   p "----- GAME #{game_num} PLAYERINNINGS CREATED -----"
-end
+# end
 
 
 # game = Game.create!(

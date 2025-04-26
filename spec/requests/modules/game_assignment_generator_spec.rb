@@ -69,7 +69,8 @@ RSpec.describe GameAssignmentGenerator do
     end
 
     context 'when the team has >10 players' do
-      let(:number_of_gameday_players) { 12 }
+      let(:number_of_gameday_players) { 13 }
+      let(:number_of_innings) { 6 }
       let(:player_game_assignments) do
         create_initial_assignments(gameday_team, number_of_gameday_players, number_of_innings)
       end

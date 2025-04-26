@@ -28,7 +28,7 @@ module Assignable
           game_assignments: innings.map do |inning|
             {
               inning_number: inning.inning.inning_number,
-              position: inning.fielding_position.name
+              position: inning.fielding_position&.name.nil? ? "------" : inning.fielding_position.name
             }
           end
         }
