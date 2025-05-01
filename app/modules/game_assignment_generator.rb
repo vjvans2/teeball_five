@@ -7,9 +7,9 @@ module GameAssignmentGenerator
 
      begin
       assign_inning(player_game_assignments, inning_index, override_log, override_counter)
-     rescue
+     rescue => e
 
-      binding.pry
+      # binding.pry
       player_game_assignments.each { |pga| pga[:game_assignments][inning_index] = nil }
       assign_inning(player_game_assignments, inning_index, override_log, override_counter)
      end
@@ -19,6 +19,16 @@ module GameAssignmentGenerator
   end
 
   def assign_inning(player_game_assignments, inning_index, override_log, override_counter)
+    # account for nils and leverage the algorithm to be equitable with them
+    num_of_nils = player_game_assignments.size - 10
+    if num_of_nils > 0
+      # already_nild_this_game = player_game_assignments.where {|pga| pga[:game_assignments].any(&:nil?) }
+      # prioritize players who haven't been out yet this game
+      Array.new(num_of_nils) { nil }.each do |nil_position|
+        assign_position(player_game_assignments, nil_position, inning_index, override_log, override_counter)
+      end
+    end
+
     FieldingPosition.high_priority.pluck(:name).shuffle.each do |hi_pos|
       assign_position(player_game_assignments, hi_pos, inning_index, override_log, override_counter)
     end
@@ -27,13 +37,6 @@ module GameAssignmentGenerator
       assign_position(player_game_assignments, med_pos, inning_index, override_log, override_counter)
     end
 
-    # account for nils and leverage the algorithm to be equitable with them
-    num_of_nils = player_game_assignments.size - 10
-    if num_of_nils > 0
-      Array.new(num_of_nils) { nil }.each do |nil_position|
-        assign_position(player_game_assignments, nil_position, inning_index, override_log, override_counter)
-      end
-    end
 
     FieldingPosition.low_priority.pluck(:name).shuffle.each do |low_pos|
       assign_position(player_game_assignments, low_pos, inning_index, override_log, override_counter)

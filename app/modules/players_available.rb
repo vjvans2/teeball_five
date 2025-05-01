@@ -7,14 +7,13 @@ module PlayersAvailable
     return [] if already_placed.size == player_game_assignments.size
 
     eligible_players = player_ids_in_line_to_play_position(selected_position, player_game_assignments, already_placed)
-    # binding.irb if inning_index == 1
+    # binding.irb if selected_position == nil
     filter_valid_players(player_game_assignments, eligible_players, selected_position, inning_index)
   end
 
   def filter_valid_players(player_game_assignments, player_ids, position, inning_index)
     valid_players = []
     invalid_players = []
-    # binding.irb if inning_index == 1
     player_ids.each do |player_id|
       player_assignment = player_game_assignments.find { |pga| pga[:player_id] == player_id }
       validation = is_valid_choice?(player_assignment, position, inning_index)
@@ -91,11 +90,12 @@ module PlayersAvailable
     selected_is_infield = infield_positions.include?(selected_position)
     last_inning_position = current_player_game[:game_positions][inning_index - 1]
 
+    return { valid: false, reason: "out two innings in a row" } if last_inning_position.nil? && selected_position.nil?
     return { valid: false, reason: "repeat infield position" } if current_player_game[:game_positions].include?(selected_position) && !selected_is_infield && !selected_position.nil?
+
     return { valid: false, reason: "full_infield" } if current_player_game[:full_infield?] && selected_is_infield
-    return { valid: false, reason: "can't two outfields in a row" } if outfield_positions.include?(last_inning_position) && selected_is_outfield
+    # return { valid: false, reason: "can't two outfields in a row" } if outfield_positions.include?(last_inning_position) && selected_is_outfield
     return { valid: false, reason: "full_outfield" } if current_player_game[:full_outfield?] && selected_is_outfield
-    # return { valid: true, reason: "out two innings in a row" } if last_inning_position.nil?
 
     { valid: true, reason: nil }
   end
