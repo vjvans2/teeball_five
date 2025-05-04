@@ -13,11 +13,13 @@ RSpec.describe GameAssignmentGenerator do
   let(:initial_assignments) { [] }
 
   def create_fielding_positions
-    positions = %w[LF LC RC RF P C 1B 2B SS 3B]
+    positions = %w[P C 1B 2B SS 3B NILL OF]
     positions.each do |position|
       rank = case position
       when 'P', '1B' then 1
       when '2B', 'SS', '3B' then 2
+      when 'NILL' then 4
+      when 'OF' then 5
       else 3
       end
       create(:fielding_position, name: position, hierarchy_rank: rank)
@@ -50,18 +52,47 @@ RSpec.describe GameAssignmentGenerator do
       )
     end
 
-    context 'when an empty player_game_assignments is provided' do
-      it 'initially has {number_of_innings} nil game_assignments in the array' do
-        player_game_assignments.each do |pga|
-          expect(pga[:game_assignments].all?(&:nil?)).to eq true
-          expect(pga[:game_assignments].size).to eq number_of_innings
+    context 'when the team has 10 players' do
+      context 'when an empty player_game_assignments is provided' do
+        it 'initially has {number_of_innings} nil game_assignments in the array' do
+          player_game_assignments.each do |pga|
+            expect(pga[:game_assignments].all?(&:nil?)).to eq true
+            expect(pga[:game_assignments].size).to eq number_of_innings
+          end
+        end
+
+        it 'fully populates all player_game_assignments' do
+          result.each do |r|
+            expect(r[:game_assignments].all?(&:present?)).to eq true
+            expect(r[:game_assignments].size).to eq number_of_innings
+          end
         end
       end
+    end
 
-      it 'fully populates the player_game_assignments' do
-        result.each do |r|
-          expect(r[:game_assignments].all?(&:present?)).to eq true
-          expect(r[:game_assignments].size).to eq number_of_innings
+    context 'when the team has >10 players' do
+      let(:number_of_gameday_players) { 13 }
+      let(:number_of_innings) { 6 }
+      let(:player_game_assignments) do
+        create_initial_assignments(gameday_team, number_of_gameday_players, number_of_innings)
+      end
+      context 'when an empty player_game_assignments is provided' do
+        it 'initially has {number_of_innings} nil game_assignments in the array' do
+          player_game_assignments.each do |pga|
+            expect(pga[:game_assignments].all?(&:nil?)).to eq true
+            expect(pga[:game_assignments].size).to eq number_of_innings
+          end
+        end
+
+        it 'fully populates all player_game_assignments' do
+          result.each do |r|
+            expect(r[:game_assignments].size).to eq number_of_innings
+          end
+        end
+
+        it 'has the correct amount of equitable empty spaces in the fielding assignments' do
+          the_sum_of_all_nils = result.map { |r| r[:game_assignments] }.flatten.count(nil)
+          expect(the_sum_of_all_nils).to eq ((number_of_gameday_players - 10)*4)
         end
       end
     end

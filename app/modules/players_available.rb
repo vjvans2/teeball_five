@@ -7,13 +7,12 @@ module PlayersAvailable
     return [] if already_placed.size == player_game_assignments.size
 
     eligible_players = player_ids_in_line_to_play_position(selected_position, player_game_assignments, already_placed)
-    filter_valid_players(player_game_assignments, eligible_players, selected_position, inning_index, override_log, override_counter)
+    filter_valid_players(player_game_assignments, eligible_players, selected_position, inning_index)
   end
 
-  def filter_valid_players(player_game_assignments, player_ids, position, inning_index, override_log, override_counter)
+  def filter_valid_players(player_game_assignments, player_ids, position, inning_index)
     valid_players = []
     invalid_players = []
-
     player_ids.each do |player_id|
       player_assignment = player_game_assignments.find { |pga| pga[:player_id] == player_id }
       validation = is_valid_choice?(player_assignment, position, inning_index)
@@ -26,8 +25,7 @@ module PlayersAvailable
     end
 
     if valid_players.empty?
-      log_override(invalid_players, override_log, override_counter)
-      invalid_players.map { |player| player[:player_id] }
+      nil
     else
       valid_players
     end
@@ -85,32 +83,28 @@ module PlayersAvailable
     return { valid: true, reason: nil } if inning_index == 0 && player_assignments[:previous_assignments].empty?
 
     current_player_game = current_player_game_assignments(player_assignments)
-
-    # have you played this {selected_infield_position} already this game?
-    return { valid: false, reason: "repeat position" } if current_player_game[:game_positions].include?(selected_position)
-
-    # TODO ---- handle outfield duplicates and "good game" vs. "bad game" assignments
-    # # is {selected_position} in the outfield and you already played two outfield innings this game?
-    outfield_positions = FieldingPosition.outfield.pluck(:name)
-    return { valid: false, reason: "full_outfield" } if current_player_game[:full_outfield?] && outfield_positions.include?(selected_position)
-
-    # did you play infield last inning, play outfield next
-
-    # is {selected_position} in the infield and you already played two infield innings this game?
     infield_positions = FieldingPosition.infield.pluck(:name)
-    return { valid: false, reason: "full_infield" } if current_player_game[:full_infield?] && infield_positions.include?(selected_position)
+    selected_is_infield = infield_positions.include?(selected_position)
+    last_inning_position = current_player_game[:game_positions][inning_index - 1]
+
+    return { valid: false, reason: "repeat infield position" } if selected_is_infield && current_player_game[:game_positions].include?(selected_position)
+    return { valid: false, reason: "out two innings in a row" } if last_inning_position == "NILL" && selected_position == "NILL"
+    return { valid: false, reason: "if outfield,can\'t be outfield again" } if selected_position == "OF" && last_inning_position == "OF"
+    return { valid: false, reason: "if P, can't also be 1B" } if current_player_game[:game_positions].include?("1B") && selected_position == "P" && inning_index < 4
+    return { valid: false, reason: "if 1B, can't also be P" } if current_player_game[:game_positions].include?("P") && selected_position == "1B" && inning_index < 4
+    return { valid: false, reason: "full_infield" } if current_player_game[:full_infield?] && selected_is_infield
+    return { valid: false, reason: "full_outfield" } if current_player_game[:full_outfield?] && selected_position == "OF"
 
     { valid: true, reason: nil }
   end
 
   def current_player_game_assignments(player_assignments)
     player_flat_array = player_assignments[:game_assignments]
-    outfield_positions = FieldingPosition.outfield.pluck(:name)
     infield_positions = FieldingPosition.infield.pluck(:name)
     {
       game_positions: player_flat_array,
-      full_outfield?: (outfield_positions & player_flat_array).size == 2,
-      full_infield?: (infield_positions & player_flat_array).size == 2
+      full_infield?: (infield_positions & player_flat_array).size == 4,
+      full_outfield?: player_flat_array.count("OF") == 2
     }
   end
 end
