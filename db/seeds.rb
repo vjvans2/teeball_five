@@ -23,7 +23,7 @@ positions.each do |position|
   when *generic_outfield
     5
   else
-      3
+    99
   end
 
   FieldingPosition.create!(name: position, hierarchy_rank: rank)
@@ -67,33 +67,33 @@ Coach.create!(
   team: team
 )
 
-  (1..4).each do |game_num|
-  # game_num = 1
-  game = Game.create!(
-    location: Faker::TvShows::Archer.location,
-    is_home: true,
-    opponent_name: "#{Faker::TvShows::Archer.character}'s whining kids --- GAME #{game_num}",
-    date: Date.new(2024, 3, game_num),
-    season_id: season.id
-  )
+#   (1..4).each do |game_num|
+#   # game_num = 1
+#   game = Game.create!(
+#     location: Faker::TvShows::Archer.location,
+#     is_home: true,
+#     opponent_name: "#{Faker::TvShows::Archer.character}'s whining kids --- GAME #{game_num}",
+#     date: Date.new(2024, 3, game_num),
+#     season_id: season.id
+#   )
 
-  # create gameday team
-  gameday_team = GamedayTeam.create!(
-    game_id: game.id,
-    team_id: team.id
-  )
+#   # create gameday team
+#   gameday_team = GamedayTeam.create!(
+#     game_id: game.id,
+#     team_id: team.id
+#   )
 
-  # # create gameday players
-  gameday_players = []
-  player_ids.each do |player_id|
-    gameday_players << GamedayPlayer.create!(
-      player_id: player_id,
-      is_present: true,
-      gameday_team_id: gameday_team.id
-    )
-  end
+#   # # create gameday players
+#   gameday_players = []
+#   player_ids.each do |player_id|
+#     gameday_players << GamedayPlayer.create!(
+#       player_id: player_id,
+#       is_present: true,
+#       gameday_team_id: gameday_team.id
+#     )
+#   end
 
-  GameAssignmentsService.new(gameday_team, 6).generate_game_assignments
+#   GameAssignmentsService.new(gameday_team, 6).generate_game_assignments
 
-  p "----- GAME #{game_num} PLAYERINNINGS CREATED -----"
-end
+#   p "----- GAME #{game_num} PLAYERINNINGS CREATED -----"
+# end

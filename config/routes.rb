@@ -22,7 +22,7 @@ Rails.application.routes.draw do
   end
 
   resources :players, except: [ :new, :create, :update ]
-  resources :games, only: [ :index, :show ]
-  resources :gameday_teams, only: [ :show ]
-  resources :gameday_players, only: [ :show ]
+  resources :games, only: [ :new, :index, :show, :create, :update ]
+  resources :gameday_teams, only: [ :new, :create, :update ]
+  resources :gameday_players, only: [ :new, :create, :update ]
 end
