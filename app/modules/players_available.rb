@@ -7,7 +7,6 @@ module PlayersAvailable
     return [] if already_placed.size == player_game_assignments.size
 
     eligible_players = player_ids_in_line_to_play_position(selected_position, player_game_assignments, already_placed)
-    # binding.irb if selected_position == nil
     filter_valid_players(player_game_assignments, eligible_players, selected_position, inning_index)
   end
 
@@ -84,30 +83,25 @@ module PlayersAvailable
     return { valid: true, reason: nil } if inning_index == 0 && player_assignments[:previous_assignments].empty?
 
     current_player_game = current_player_game_assignments(player_assignments)
-    outfield_positions = FieldingPosition.outfield.pluck(:name)
     infield_positions = FieldingPosition.infield.pluck(:name)
-    selected_is_outfield =  outfield_positions.include?(selected_position)
     selected_is_infield = infield_positions.include?(selected_position)
     last_inning_position = current_player_game[:game_positions][inning_index - 1]
+    two_innings_ago_position = current_player_game[:game_positions][inning_index - 2]
 
-    return { valid: false, reason: "out two innings in a row" } if last_inning_position.nil? && selected_position.nil?
-    return { valid: false, reason: "repeat infield position" } if current_player_game[:game_positions].include?(selected_position) && !selected_is_infield && !selected_position.nil?
-
+    return { valid: false, reason: "out two innings in a row" } if last_inning_position == "NILL" && selected_position == "NILL"
+    return { valid: false, reason: "three of in a row" } if last_inning_position == "OF" && two_innings_ago_position == "OF" && selected_position == "OF"
+    return { valid: false, reason: "repeat infield position" } if selected_is_infield && current_player_game[:game_positions].include?(selected_position)
     return { valid: false, reason: "full_infield" } if current_player_game[:full_infield?] && selected_is_infield
-    # return { valid: false, reason: "can't two outfields in a row" } if outfield_positions.include?(last_inning_position) && selected_is_outfield
-    return { valid: false, reason: "full_outfield" } if current_player_game[:full_outfield?] && selected_is_outfield
 
     { valid: true, reason: nil }
   end
 
   def current_player_game_assignments(player_assignments)
     player_flat_array = player_assignments[:game_assignments]
-    outfield_positions = FieldingPosition.outfield.pluck(:name)
     infield_positions = FieldingPosition.infield.pluck(:name)
     {
       game_positions: player_flat_array,
-      full_outfield?: (outfield_positions & player_flat_array).size == 3,
-      full_infield?: (infield_positions & player_flat_array).size == 3
+      full_infield?: (infield_positions & player_flat_array).size == 4
     }
   end
 end

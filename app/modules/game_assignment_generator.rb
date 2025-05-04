@@ -9,7 +9,6 @@ module GameAssignmentGenerator
       assign_inning(player_game_assignments, inning_index, override_log, override_counter)
      rescue => e
 
-      # binding.pry
       player_game_assignments.each { |pga| pga[:game_assignments][inning_index] = nil }
       assign_inning(player_game_assignments, inning_index, override_log, override_counter)
      end
@@ -20,11 +19,10 @@ module GameAssignmentGenerator
 
   def assign_inning(player_game_assignments, inning_index, override_log, override_counter)
     # account for nils and leverage the algorithm to be equitable with them
+
     num_of_nils = player_game_assignments.size - 10
     if num_of_nils > 0
-      # already_nild_this_game = player_game_assignments.where {|pga| pga[:game_assignments].any(&:nil?) }
-      # prioritize players who haven't been out yet this game
-      Array.new(num_of_nils) { nil }.each do |nil_position|
+      Array.new(num_of_nils) { FieldingPosition.nil_position[:name] }.each do |nil_position|
         assign_position(player_game_assignments, nil_position, inning_index, override_log, override_counter)
       end
     end
@@ -37,18 +35,18 @@ module GameAssignmentGenerator
       assign_position(player_game_assignments, med_pos, inning_index, override_log, override_counter)
     end
 
-
-    FieldingPosition.low_priority.pluck(:name).shuffle.each do |low_pos|
-      assign_position(player_game_assignments, low_pos, inning_index, override_log, override_counter)
+    Array.new(4) { FieldingPosition.generic_outfield[:name] }.each do |generic_outfield|
+      assign_position(player_game_assignments, generic_outfield, inning_index, override_log, override_counter)
     end
 
+    # TODO: verify that all positions are filled
     player_game_assignments
   end
 
   def assign_position(player_game_assignments, position, inning_index, override_log, override_counter)
     player_ids = available_players(player_game_assignments, position, inning_index, override_log, override_counter)
 
-    return if player_ids.empty?
+    return if player_ids.nil? || player_ids.empty?
 
     selected_player_id = player_ids.shuffle.first
     player_game_assignments.find { |a| a[:player_id] == selected_player_id }[:game_assignments][inning_index] = position
