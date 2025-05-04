@@ -67,8 +67,8 @@ Coach.create!(
   team: team
 )
 
-  # (1..10).each do |game_num|
-  game_num = 1
+  (1..4).each do |game_num|
+  # game_num = 1
   game = Game.create!(
     location: Faker::TvShows::Archer.location,
     is_home: true,
@@ -96,3 +96,4 @@ Coach.create!(
   GameAssignmentsService.new(gameday_team, 6).generate_game_assignments
 
   p "----- GAME #{game_num} PLAYERINNINGS CREATED -----"
+end
