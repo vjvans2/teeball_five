@@ -5,11 +5,13 @@ RSpec.describe PlayersAvailable do
   let(:players_available_instance) { players_available_class.new }
 
   def create_fielding_positions
-    positions = %w[LF LC RC RF P C 1B 2B SS 3B]
+    positions = %w[P C 1B 2B SS 3B NILL OF]
     positions.each do |position|
       rank = case position
       when 'P', '1B' then 1
       when '2B', 'SS', '3B' then 2
+      when 'NILL' then 4
+      when 'OF' then 5
       else 3
       end
       create(:fielding_position, name: position, hierarchy_rank: rank)
@@ -21,7 +23,7 @@ RSpec.describe PlayersAvailable do
   end
 
   describe '#current_player_game_assignments' do
-    let(:game_assignments) { [ 'LF', nil, nil, nil ] }
+    let(:game_assignments) { [ 'OF', nil, nil, nil ] }
     let(:player_assignments) do
       {
         player_id: 1,
@@ -46,7 +48,7 @@ RSpec.describe PlayersAvailable do
     end
 
     context 'when the player_game_assignments are after 4 innings' do
-      let(:game_assignments) { [ 'LF', 'P', 'RF', 'SS' ] }
+      let(:game_assignments) { [ 'OF', 'P', 'OF', 'SS' ] }
       it 'returns the positions' do
         result = players_available_instance.current_player_game_assignments(player_assignments)
         expect(result[:game_positions]).to eq game_assignments
@@ -101,9 +103,9 @@ RSpec.describe PlayersAvailable do
     end
 
     context 'when a player has already been assigned two outfield positions during a game' do
-      let(:game_assignments) { [ 'LF', 'RF', nil, nil ] }
+      let(:game_assignments) { [ 'OF', 'OF', nil, nil ] }
       let(:inning_index) { 2 }
-      let(:selected_position) { "RC" }
+      let(:selected_position) { "OF" }
       it 'will not be valid' do
         expect(result[:valid]).to be false
       end
@@ -124,7 +126,7 @@ RSpec.describe PlayersAvailable do
     end
 
     context 'when a player doesn\'t trigger one of the false conditions' do
-      let(:game_assignments) { [ '1B', 'LF', nil, nil ] }
+      let(:game_assignments) { [ '1B', 'OF', nil, nil ] }
       let(:inning_index) { 2 }
       it 'will not be valid' do
         expect(result[:valid]).to be true
@@ -142,7 +144,7 @@ RSpec.describe PlayersAvailable do
       players.map do |player|
         {
           player_id: player.id,
-          game_assignments: [ '1B', '2B', 'LF', 'RF' ]
+          game_assignments: [ '1B', '2B', 'OF', 'OF' ]
         }
       end
     end
@@ -167,7 +169,7 @@ RSpec.describe PlayersAvailable do
           if index.odd?
             odd_players << {
               player_id: player.id,
-              game_assignments: [ 'P', 'LF', 'RF', '2B' ]
+              game_assignments: [ 'P', 'OF', 'OF', '2B' ]
             }
           end
         end
@@ -180,12 +182,12 @@ RSpec.describe PlayersAvailable do
   end
 
   describe '#player_ids_in_line_to_play_position' do
-    let(:selected_position) { 'LF' }
+    let(:selected_position) { 'OF' }
     let(:player_game_assignments) do
       [
-        { player_id: 1, previous_assignments: [ { game_assignments: [ { position: 'LF' } ] } ], game_assignments: [] },
+        { player_id: 1, previous_assignments: [ { game_assignments: [ { position: 'OF' } ] } ], game_assignments: [] },
         { player_id: 2, previous_assignments: [], game_assignments: [] },
-        { player_id: 3, previous_assignments: [ { game_assignments: [ { position: 'RF' } ] } ], game_assignments: [ 'LF' ] }
+        { player_id: 3, previous_assignments: [ { game_assignments: [ { position: 'OF' } ] } ], game_assignments: [ 'OF' ] }
       ]
     end
     let(:already_placed) { [ 3 ] }
@@ -198,16 +200,16 @@ RSpec.describe PlayersAvailable do
     end
     context 'when previous_assignments and already_placed add limits' do
       it 'returns player 2 as only eligible player for the position' do
-        expect(result).to eq([ 2 ]) # Player 2 has never played LF, Player 1 has once.  Player 3 is already placed.
+        expect(result).to eq([ 2 ]) # Player 2 has never played OF, Player 1 has once.  Player 3 is already placed.
       end
     end
 
     context 'when previous_assignments present only' do
       let(:player_game_assignments) do
         [
-          { player_id: 1, previous_assignments: [ { game_assignments: [ { position: 'LF' } ] } ], game_assignments: [] },
+          { player_id: 1, previous_assignments: [ { game_assignments: [ { position: 'OF' } ] } ], game_assignments: [] },
           { player_id: 2, previous_assignments: [], game_assignments: [] },
-          { player_id: 3, previous_assignments: [ { game_assignments: [ { position: 'RF' } ] } ], game_assignments: [] }
+          { player_id: 3, previous_assignments: [ { game_assignments: [ { position: 'OF' } ] } ], game_assignments: [] }
         ]
       end
       let(:already_placed) { [] }
@@ -228,22 +230,18 @@ RSpec.describe PlayersAvailable do
     let(:player_game_assignments) do
       [
         { player_id: 1, previous_assignments: [], game_assignments: [] },
-        { player_id: 2, previous_assignments: [], game_assignments: [ 'LF' ] }
+        { player_id: 2, previous_assignments: [], game_assignments: [ 'OF' ] }
       ]
     end
     let(:player_ids) { [ 1, 2 ] }
-    let(:position) { 'LF' }
+    let(:position) { 'OF' }
     let(:inning_index) { 0 }
-    let(:override_log) { [] }
-    let(:override_counter) { 0 }
     let(:result) do
       players_available_instance.filter_valid_players(
         player_game_assignments,
         player_ids,
         position,
         inning_index,
-        override_log,
-        override_counter
       )
     end
 
@@ -254,7 +252,7 @@ RSpec.describe PlayersAvailable do
     end
 
     context 'when there are no valid players' do
-      let(:player_ids) { [ 2 ] } # Only player 2, who has already played LF, is considered.
+      let(:player_ids) { [ 2 ] } # Only player 2, who has already played OF, is considered.
       it 'returns a list of invalid player_ids' do
         expect(result).to eq([ 2 ])
       end
@@ -265,10 +263,10 @@ RSpec.describe PlayersAvailable do
     let(:player_game_assignments) do
       [
         { player_id: 1, previous_assignments: [], game_assignments: [] },
-        { player_id: 2, previous_assignments: [], game_assignments: [ 'LF' ] }
+        { player_id: 2, previous_assignments: [], game_assignments: [ 'OF' ] }
       ]
     end
-    let(:selected_position) { 'LF' }
+    let(:selected_position) { 'OF' }
     let(:inning_index) { 0 }
     let(:override_log) { [] }
     let(:override_counter) { 0 }
@@ -284,15 +282,15 @@ RSpec.describe PlayersAvailable do
 
     context 'when not all players are already placed' do
       it 'returns a list of valid players for the position' do
-        expect(result).to eq([ 1 ]) # Player 1 is valid for LF.
+        expect(result).to eq([ 1 ]) # Player 1 is valid for OF.
       end
     end
 
     context 'when all players are already placed' do
       let(:player_game_assignments) do
         [
-          { player_id: 1, previous_assignments: [], game_assignments: [ 'LF' ] },
-          { player_id: 2, previous_assignments: [], game_assignments: [ 'LF' ] }
+          { player_id: 1, previous_assignments: [], game_assignments: [ 'OF' ] },
+          { player_id: 2, previous_assignments: [], game_assignments: [ 'OF' ] }
         ]
       end
       it 'returns an empty list' do
