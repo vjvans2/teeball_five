@@ -26,7 +26,7 @@ class Game < ApplicationRecord
   belongs_to :season
 
   def pretty_date
-    date.strftime("%B %d, %Y, %I:%M %p")
+    date.strftime("%B %d, %Y")
   end
 
   def name

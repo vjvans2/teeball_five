@@ -24,7 +24,7 @@ class GamedayPlayersController < ApplicationController
     # TODO: add a spot to put in the num of innings
     GameAssignmentsService.new(gameday_team, 6).generate_game_assignments
 
-    redirect_to game_path(id: gameday_team[:game_id]), notice: "Game successfully created"
+    redirect_to edit_game_player_innings_path(gameday_team_id: gameday_team_id), notice: "Game successfully created"
   end
 
   private

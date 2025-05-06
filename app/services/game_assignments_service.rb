@@ -28,7 +28,7 @@ class GameAssignmentsService
 
   def retrieve_prior_game_assignments(game_id)
     flat_player_innings = @gameday_team.gameday_players.sort_by { |player| player[:jersey_number] }.map do |gameday_player|
-    gameday_player.player_innings.select { |gdpi| gdpi[:game_id] == game_id }
+      gameday_player.player_innings.select { |gdpi| gdpi[:game_id] == game_id }
     end.flatten
 
     flat_player_innings.group_by(&:player_id)
@@ -41,6 +41,7 @@ class GameAssignmentsService
         batting_order: innings.first.batting_order,
         game_assignments: innings.map do |inning|
           {
+            player_inning_id: inning.id,
             inning_number: inning.inning.inning_number,
             position: inning.fielding_position&.name.nil? ? "------" : inning.fielding_position.name
           }
