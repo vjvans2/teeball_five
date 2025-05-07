@@ -6,8 +6,10 @@ module GameAssignmentGenerator
       inning_index = inning - 1
 
       assign_inning(player_game_assignments, inning_index, override_log, override_counter)
+      counter = 1
 
-      if player_game_assignments.any? { |pga| pga[:game_assignments][inning_index].nil? }
+      while player_game_assignments.any? { |pga| pga[:game_assignments][inning_index].nil? } && counter <= 5
+        counter += 1
         player_game_assignments.each { |pga| pga[:game_assignments][inning_index] = nil }
         assign_inning(player_game_assignments, inning_index, override_log, override_counter)
       end
@@ -17,6 +19,10 @@ module GameAssignmentGenerator
   end
 
   def assign_inning(player_game_assignments, inning_index, override_log, override_counter)
+    Array.new(4) { FieldingPosition.generic_outfield[:name] }.each do |generic_outfield|
+      assign_position(player_game_assignments, generic_outfield, inning_index, override_log, override_counter)
+    end
+
     num_of_nils = player_game_assignments.size - 10
     if num_of_nils > 0
       Array.new(num_of_nils) { FieldingPosition.nil_position[:name] }.each do |nil_position|
@@ -24,9 +30,6 @@ module GameAssignmentGenerator
       end
     end
 
-    Array.new(4) { FieldingPosition.generic_outfield[:name] }.each do |generic_outfield|
-      assign_position(player_game_assignments, generic_outfield, inning_index, override_log, override_counter)
-    end
     FieldingPosition.high_priority.pluck(:name).shuffle.each do |hi_pos|
       assign_position(player_game_assignments, hi_pos, inning_index, override_log, override_counter)
     end

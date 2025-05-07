@@ -58,7 +58,7 @@ RSpec.describe GameAssignmentsService, type: :service do
   describe '#retrieve_prior_game_assignments' do
     context 'when a previous game_id is provided' do
       it 'retrieves and formats the game data' do
-        result = GameAssignmentsService.new(gameday_team).retrieve_prior_game_assignments(game.id)
+        result = GameAssignmentsService.new(gameday_team).retrieve_prior_game_assignments
         result.each do |r|
           expect(r[:player][:name]).not_to eq nil
           expect(r[:player][:jersey_number]).not_to eq nil
