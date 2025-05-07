@@ -1,5 +1,14 @@
 <h1><%= @gameday_team.game.full_legal_game_name%></h1>
 <h4> --- Tentative Assignments --- </h4>
+<% if @invalid_innings.any?  %>
+  <div class="alert alert-danger">
+    <h4>Missing Positions:</h4>
+      <% @invalid_innings.each do |record| %>
+          <p>Inning <%= record[:inning_num] %> has missing positions ---- <%= record[:positions_missing] %></p>
+      <% end %>
+  </div>
+<% end %>
+
 <br>
 <%= form_with url: update_multiple_player_innings_path, method: :put do %>
     <table>
@@ -9,7 +18,9 @@
         <th style="text-align: center; border: 1px solid black; padding: 8px;">Player</th>
         <th style="text-align: center; border: 1px solid black; padding: 8px;">#</th>
         <% 1.upto(6) do |inning| %>
-          <th style="text-align: center; border: 1px solid black; padding: 8px;">Inning <%= inning %></th>
+          <th style="text-align: center; border: 1px solid black; padding: 8px;">
+            Inning <%= inning %>
+          </th>
         <% end %>
       </tr>
     </thead>
@@ -31,5 +42,6 @@
   </table>
 <br>
   <%= hidden_field_tag :game_id, @gameday_team.game_id %>
+  <%# <%= submit_tag "Save Changes", class: "btn btn-primary", disabled: @invalid_innings.any? %> 
   <%= submit_tag "Save Changes", class: "btn btn-primary" %>
 <% end %>
