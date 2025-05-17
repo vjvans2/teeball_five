@@ -6,7 +6,7 @@
   <% @players.each do |player| %>
     <div>
       <%= check_box_tag "gameday_players[][player_id]", player[:id], true %>
-      <%= label_tag :player_full_name, player[:full_name] %>
+      <%= label_tag :player_gameday_player_label_name, player[:label_name] %>
     </div>
   <% end %>
   <%= hidden_field_tag :gameday_team_id, params[:gameday_team_id] %>

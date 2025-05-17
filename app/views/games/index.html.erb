@@ -6,6 +6,9 @@
   <% @games.each do |game| %>
     <li>
       <%= link_to game.full_legal_game_name, game_path(game) %>
+      <%= link_to 'Delete', game_path(game), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: "btn btn-danger btn-sm" %>
+
     </li>
+    
   <% end %>
 </ul>
