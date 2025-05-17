@@ -1,0 +1,21 @@
+<h1>Select Gameday Players</h1>
+
+<h4>Which players are available today?</h4>
+
+<%= form_with url: gameday_players_path, method: :create do %>
+  <% @players.each do |player| %>
+    <div>
+      <%= check_box_tag "gameday_players[][player_id]", player[:id], true %>
+      <%= label_tag :player_full_name, player[:full_name] %>
+    </div>
+  <% end %>
+  <%= hidden_field_tag :gameday_team_id, params[:gameday_team_id] %>
+
+  <%= submit_tag "Save Gameday Players" %>
+<% end %>
+
+<%# 
+"gameday_players — this will be the root key in the params hash (an array of selected players).
+"[]" — this tells Rails to treat each checkbox input as part of an array.
+[player_id] — this tells Rails that each array item is a hash with a player_id key.
+ %>

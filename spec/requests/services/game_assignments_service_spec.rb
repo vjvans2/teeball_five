@@ -12,12 +12,12 @@ RSpec.describe GameAssignmentsService, type: :service do
   let!(:gameday_players) { players.map { |player| create(:gameday_player, player: player, gameday_team: gameday_team) } }
 
   def create_fielding_positions
-    positions = %w[P C 1B 2B SS 3B NILL OF]
+    positions = %w[P C 1B 2B SS 3B _OUT_ OF]
     positions.each do |position|
       rank = case position
       when 'P', '1B' then 1
       when '2B', 'SS', '3B' then 2
-      when 'NILL' then 4
+      when '_OUT_' then 4
       when 'OF' then 5
       else 3
       end
@@ -58,7 +58,7 @@ RSpec.describe GameAssignmentsService, type: :service do
   describe '#retrieve_prior_game_assignments' do
     context 'when a previous game_id is provided' do
       it 'retrieves and formats the game data' do
-        result = GameAssignmentsService.new(gameday_team).retrieve_prior_game_assignments(game.id)
+        result = GameAssignmentsService.new(gameday_team).retrieve_prior_game_assignments
         result.each do |r|
           expect(r[:player][:name]).not_to eq nil
           expect(r[:player][:jersey_number]).not_to eq nil

@@ -18,4 +18,8 @@ class Team < ApplicationRecord
   def full_team_name
     "#{city} #{name}"
   end
+
+  def head_coach
+    coaches.find_by(is_head_coach: true)&.full_name
+  end
 end

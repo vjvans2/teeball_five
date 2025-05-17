@@ -1,0 +1,45 @@
+<h1>New Game</h1>
+<% if @game.errors.any? %>
+  <div class="alert alert-danger">
+    <h4>Errors:</h4>
+    <ul>
+      <% @game.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with(model: @game, class: "form") do |form| %>
+  <div class="mb-3">
+    <%= form.label :location, class: "form-label" %>
+    <%= form.text_field :location, class: "form-control", placeholder: "Enter Game Location" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :is_home, class: "form-label" %>
+    <%= form.check_box :is_home%>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :opponent_name, class: "form-label" %>
+    <%= form.text_field :opponent_name, class: "form-control", placeholder: "Enter Opposing Team Name" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :date, class: "form-label" %>
+    <%= form.date_field :date, class: "form-control", placeholder: "Enter Game Date" %>
+  </div>
+  
+  <div class="mb-3">
+    <%= form.label :season_name, class: "form-label"%>
+    <%= form.text_field :season_name, class: "form-control", disabled: true, placeholder: "WYBSL Spring 2025" %>
+  </div>
+
+  <%= form.hidden_field :team_id, value: params[:team_id] %>
+
+  <div class="mb-3">
+    <%= form.submit "Create Game", class: "btn btn-primary" %>
+    <%= link_to 'Cancel', teams_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
