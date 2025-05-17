@@ -88,7 +88,7 @@ module PlayersAvailable
     last_inning_position = current_player_game[:game_positions][inning_index - 1]
 
     return { valid: false, reason: "repeat infield position" } if selected_is_infield && current_player_game[:game_positions].include?(selected_position)
-    return { valid: false, reason: "out two innings in a row" } if last_inning_position == "NILL" && selected_position == "NILL"
+    return { valid: false, reason: "out two innings in a row" } if last_inning_position == "_OUT_" && selected_position == "_OUT_"
     # return { valid: false, reason: "if outfield,can\'t be outfield again" } if selected_position == "OF" && last_inning_position == "OF"
     return { valid: false, reason: "if P, can't also be 1B" } if current_player_game[:game_positions].include?("1B") && selected_position == "P" && inning_index < 4
     return { valid: false, reason: "if 1B, can't also be P" } if current_player_game[:game_positions].include?("P") && selected_position == "1B" && inning_index < 4

@@ -32,7 +32,7 @@ class GameAssignmentsService
     .map do |player_id, innings|
       {
         player: {
-          name:  Player.find(player_id).full_name,
+          name:  Player.find(player_id).first_name,
           jersey_number: Player.find(player_id).jersey_number
         },
         batting_order: innings.first.batting_order,
@@ -71,7 +71,7 @@ class GameAssignmentsService
   end
 
   def expected_game_inning_ids
-    nill_id = FieldingPosition.find_by_name("NILL").id
+    out_id = FieldingPosition.find_by_name("_OUT_").id
     of_id = FieldingPosition.find_by_name("OF").id
 
     base_positions = %w[P C 1B 2B SS 3B]
@@ -88,13 +88,13 @@ class GameAssignmentsService
       final << Array.new(4) { of_id }
     when 11
       final << Array.new(4) { of_id }
-      final << Array.new(1) { nill_id }
+      final << Array.new(1) { out_id }
     when 12
       final << Array.new(4) { of_id }
-      final << Array.new(2) { nill_id }
+      final << Array.new(2) { out_id }
     when 13
       final << Array.new(4) { of_id }
-      final << Array.new(3) { nill_id }
+      final << Array.new(3) { out_id }
     else
       "hi mom"
     end
