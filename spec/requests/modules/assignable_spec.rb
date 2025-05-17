@@ -5,12 +5,12 @@ RSpec.describe Assignable do
   let(:assignable_instance) { assignable_class.new }
 
   def create_fielding_positions
-    positions = %w[P C 1B 2B SS 3B NILL OF]
+    positions = %w[P C 1B 2B SS 3B _OUT_ OF]
     positions.each do |position|
       rank = case position
       when 'P', '1B' then 1
       when '2B', 'SS', '3B' then 2
-      when 'NILL' then 4
+      when '_OUT_' then 4
       when 'OF' then 5
       else 3
       end

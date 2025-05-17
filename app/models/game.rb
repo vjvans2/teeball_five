@@ -26,7 +26,7 @@ class Game < ApplicationRecord
   belongs_to :season
 
   def pretty_date
-    date.strftime("%B %d, %Y, %I:%M %p")
+    date.strftime("%B %d, %Y")
   end
 
   def name
@@ -38,6 +38,10 @@ class Game < ApplicationRecord
   end
 
   def game_assignments
-    GameAssignmentsService.new(gameday_team).retrieve_prior_game_assignments(id)
+    GameAssignmentsService.new(gameday_team).retrieve_prior_game_assignments
+  end
+
+  def current_game_inning_ids
+    GameAssignmentsService.new(gameday_team).current_game_inning_ids
   end
 end
