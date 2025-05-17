@@ -1,7 +1,7 @@
 class GamedayPlayersController < ApplicationController
   def new
     @gameday_team_id = params[:gameday_team_id]
-    @players = gameday_team.team.players.map { |p| { id: p.id, full_name: p.full_name, jersey_number: p.jersey_number } }
+    @players = gameday_team.team.players.map { |p| { id: p.id, label_name: p.gameday_player_label_name, jersey_number: p.jersey_number } }.sort_by { |pl| pl[:jersey_number] }
     render status: :ok
   end
 

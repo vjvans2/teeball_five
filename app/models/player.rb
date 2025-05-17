@@ -35,6 +35,10 @@ class Player < ApplicationRecord
     "#{first_name} #{last_name}"
   end
 
+  def gameday_player_label_name
+    "##{jersey_number} -- #{first_name}"
+  end
+
   def safe_decrement!(property)
     # Check if the property exists and is a valid numeric field
     if self.respond_to?(property) && self.send(property).is_a?(Numeric)
