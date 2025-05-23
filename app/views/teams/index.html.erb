@@ -22,6 +22,7 @@
           <%= link_to 'Edit', edit_team_path(team), class: "btn btn-warning btn-sm" %>
           <%= link_to 'Delete', team_path(team), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: "btn btn-danger btn-sm" %>
           <%= link_to 'Create Roster for Next Game', new_game_path(team_id: team.id), class: 'btn btn-info btn-sm' %>
+          <%= link_to 'Show Team Report', team_path(id: team.id), class: 'btn btn-warning btm-sm' %>
 
 
         </td>
