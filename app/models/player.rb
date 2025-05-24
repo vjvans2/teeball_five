@@ -51,4 +51,24 @@ class Player < ApplicationRecord
       raise ArgumentError, "Invalid property or not a numeric field"
     end
   end
+
+  def player_assignments_to_revise
+    assignments = []
+    player_innings.group_by(&:game_id).map do |game_id, pi|
+      assigned = pi.map do |record|
+        {
+          inning: record.inning.inning_number,
+          fielding_position_id: record.fielding_position_id,
+          fielding_position_name: record.fielding_position.name
+        }
+      end
+
+      assignments << {
+        game_id:,
+        assigned:
+      }
+    end
+
+    assignments
+  end
 end
