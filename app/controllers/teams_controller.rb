@@ -9,7 +9,9 @@ class TeamsController < ApplicationController
   end
 
   # GET /teams/:id
-  def show; end
+  def show
+    @report = TeamService.new(params[:id]).generate_team_report
+  end
 
   # GET /teams/new
   def new

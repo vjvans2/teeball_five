@@ -1,7 +1,6 @@
 module Assignable
   def initial_assignments(gameday_team, number_of_gameday_players, number_of_innings)
     list = Array.new(number_of_gameday_players)
-    empty_innings = Array.new(number_of_innings) { nil }
 
     GamedayPlayer.shuffle_by_leadoff(gameday_team.gameday_players).each_with_index do |gameday_player, index|
       list[index] = {
@@ -10,7 +9,7 @@ module Assignable
         leadoffs: gameday_player.player.leadoffs,
         homeruns: gameday_player.player.homeruns,
         sit_outs: gameday_player.player.sat_out,
-        game_assignments: empty_innings.dup,
+        game_assignments: Array.new(number_of_innings) { nil },
         previous_assignments: player_previous_assignments(gameday_player)
       }
     end
