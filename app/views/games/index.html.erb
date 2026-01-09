@@ -1,14 +1,28 @@
 <h1>Games</h1>
-<p>Hello from Games!</p>
 <p>I want this to eventually be an admin level view only</p>
 
-<ul>
-  <% @games.each do |game| %>
-    <li>
-      <%= link_to game.full_legal_game_name, game_path(game) %>
-      <%= link_to 'Delete', game_path(game), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: "btn btn-danger btn-sm" %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Location</th>
+      <th>Opponent Name</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @games.each do |game| %>
+      <tr>
+        <td><%= game.date %></td>
+        <td><%= game.location %></td>
+        <td><%= game.opponent_name %>
+        <td>
+          <%= link_to 'View', game_path(game), method: :get, class: "btn btn-info btn-sm" %>
+          <%= link_to 'Edit', edit_game_path(game), class: "btn btn-warning btn-sm" %>
+          <%= link_to 'Delete', game_path(game), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: "btn btn-danger btn-sm" %>
+        </td>
 
-    </li>
-    
-  <% end %>
-</ul>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

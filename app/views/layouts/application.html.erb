@@ -35,8 +35,9 @@
           <%= flash[:alert] %>
         </div>
       <% end %>
-
-      <%= yield %>
+      <div style="max-width: 1280px; margin: 0 auto; padding: 1rem;">
+        <%= yield %>
+      </div>
     </div>
 
     <!-- Your custom JavaScript (Turbo and Stimulus controllers) -->

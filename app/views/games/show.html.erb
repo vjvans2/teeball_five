@@ -26,3 +26,11 @@
   </tbody>
 </table>
 <br><br>
+
+<div class="mb-3">
+  <%= link_to 'All Teams', teams_path, class: "btn btn-primary" %>
+  <%= link_to 'All Games', games_path, class: "btn btn-info" %>
+  <%= link_to 'Edit Game Details', edit_game_path(@game), class: "btn btn-warning" %>
+  <%= link_to 'Edit Player Details', edit_game_player_innings_path(gameday_team_id: @game.gameday_team.id), class: "btn btn-warning" %>
+  <%= link_to 'Delete Game', game_path(@game), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: "btn btn-danger" %>
+</div>
