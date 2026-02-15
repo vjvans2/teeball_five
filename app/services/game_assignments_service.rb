@@ -42,7 +42,7 @@ class GameAssignmentsService
             inning_number: inning.inning.inning_number,
             position: inning.fielding_position&.name.nil? ? "------" : inning.fielding_position.name
           }
-        end
+        end.sort_by { |ga| ga[:inning_number] }
       }
     end.sort_by { |x| x[:batting_order] }
   end
